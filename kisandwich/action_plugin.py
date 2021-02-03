@@ -9,10 +9,10 @@ def notify(text):
     return sg
 
 
-from . import kisandwich_core
-from .kisandwich_core import sandwich_from_gui, process_all, base_to_default_boardfile
-from . import kisandwich_GUI
-from .kisandwich_GUI import KisandwichGUI as KisandwichGUI
+from . import core
+from .core import sandwich_from_gui, process_all, base_to_default_boardfile
+from . import gui_dialog
+from .gui_dialog import KisandwichGUI
 
 
 class KisandwichDialog(KisandwichGUI):
@@ -97,9 +97,9 @@ class Kisandwich(pcbnew.ActionPlugin):
 
     def Run(self):
         from importlib import reload
-        import kisandwich, kisandwich.kisandwich_core
+        import kisandwich, kisandwich.core
         # reload(kisandwich)
-        reload(kisandwich.kisandwich_core)
+        reload(kisandwich.core)
 
         # load board
         livepcb = pcbnew.GetBoard()

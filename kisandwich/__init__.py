@@ -1,37 +1,18 @@
-import sys
-try:
-    from importlib import reload
-except ImportError:
-    try:
-        from imp import reload
-    except ImportError:
-        try:
-            _ = reload
-        except NameError as err:
-            raise NameError('Could not determine reload command\nPython: ' + sys.version)
-
-def notify(text):
-    try:
-        import wx
-    except ImportError:
-        print(text)
-    else:
-        dialog = wx.MessageDialog(None, text, 'One Push debug output', wx.OK)
-        sg = dialog.ShowModal()
-        return sg
+from atait_scripting_support import reload, notify, expose_kicad_python
 
 try:
-    import pcbnew
-    from kisandwich import action, core, gui
-    reload(action)
+    expose_kicad_python()
+    from kisandwich import action_plugin, core, gui_dialog
+    reload(action_plugin)
     reload(core)
-    reload(gui)
-    from .action import Kisandwich # Note the relative import!
+    reload(gui_dialog)
+
+    from .action_plugin import Kisandwich # Note the relative import!
     Kisandwich().register()  # Instantiate and register to Pcbnew
+    from .core import *
 except Exception as e:
     try:
         notify('Kisandwich import failed\n' + str(e))
     except Exception:
         pass
 
-from .core import *
