@@ -1,19 +1,9 @@
 ''' Entry point for onepush_script.py
     Hotkey the corresponding menu item: "One Push"
 '''
+from atait_scripting_support import reload
 import pcbnew
 import os, sys
-try:
-    from importlib import reload
-except ImportError:
-    try:
-        from imp import reload
-    except ImportError:
-        try:
-            _ = reload
-        except NameError as err:
-            raise NameError("Could not determine reload command\nPython: " + sys.version)
-
 
 class OnePush(pcbnew.ActionPlugin):
     def defaults(self):
@@ -27,9 +17,6 @@ class OnePush(pcbnew.ActionPlugin):
 
     def Run(self):
         # The entry function of the plugin that is executed on user action
-        scripting_dir = os.path.join(os.path.dirname(__file__), "..")
-        if scripting_dir not in sys.path:
-            sys.path.append(scripting_dir)
         import onepush_script
         reload(onepush_script)
 

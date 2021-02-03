@@ -3,7 +3,8 @@
 
     Use `import reload` to get a module reloader. When pcbnew refreshes scripts, it only reimports.
     When editing the plugins and libraries, changes will not be reflected unless they are explicitly reloaded.
-
+    - To reload when "refresh plugins" is pressed, call the command in an __init__.py file in the "plugins" directory
+    - To reload every time an action plugin is run, put the command in its "Run" method
 
 '''
 import sys

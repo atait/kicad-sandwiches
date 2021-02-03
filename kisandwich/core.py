@@ -1,7 +1,6 @@
 ''' Sandwich a.k.a. Oreo board logic
 '''
-import setup_pcbnew_coding_alex  # setup paths
-from setup_pcbnew_coding_alex import reload
+from atait_scripting_support import reload, notify
 import os
 
 import pcbnew
@@ -14,12 +13,6 @@ from kicad.pcbnew.board import Board
 # reload(drawing)
 # reload(module)
 # reload(board)
-
-def notify(text):
-    import wx
-    dialog = wx.MessageDialog(None, text, 'One Push debug output', wx.OK)
-    sg = dialog.ShowModal()
-    return sg
 
 layer_map = dict()
 layer_map['TOP'] = {

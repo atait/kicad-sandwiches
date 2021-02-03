@@ -2,12 +2,7 @@
 import wx
 import pcbnew
 import os, sys
-
-def notify(text):
-    dialog = wx.MessageDialog(None, text, 'One Push debug output', wx.OK)
-    sg = dialog.ShowModal()
-    return sg
-
+from atait_scripting_support import notify, reload
 
 from . import core
 from .core import sandwich_from_gui, process_all, base_to_default_boardfile
@@ -54,37 +49,21 @@ class KisandwichDialog(KisandwichGUI):
     def on_updating( self, event ):
         event.Skip()
 
-    # def OnChar(self, event):
-    #     key = event.GetKeyCode()
-    #     if key == wx.WXK_RETURN:
-    #         self.execute(event)
-    #     elif key == 0:
-    #         pass
-    #     else:
-    #         event.Skip()
+    def get_user_selections(self):
+        sel = dict()
+        if self.m_radioBtn_TOP.GetValue():
+            sel['wich'] = 'TOP'
+        elif self.m_radioBtn_LOW.GetValue():
+            sel['wich'] = 'LOW'
+        elif self.m_radioBtn_BOTH.GetValue():
+            sel['wich'] = 'BOTH'
+        sel['files'] = dict(
+            TOP=os.path.abspath(main_dialog.m_filePicker_TOP.GetPath()),
+            LOW=os.path.abspath(main_dialog.m_filePicker_LOW.GetPath())
+        )
+        sel['saving'] = bool(self.m_chkbox_saving.GetValue())
+        sel['refreshing'] = bool(self.m_chkbox_updating.GetValue())
 
-    # def OnQuit(self, event):
-    #     os.path.remove(self.livefile)
-    #     event.Skip()
-
-    # def SetSizeHints(self, sz1, sz2):
-    #     try:
-    #         # wxPython 3
-    #         self.SetSizeHintsSz(sz1, sz2)
-    #     except TypeError:
-    #         # wxPython 4
-    #         super(ArchiveDialog, self).SetSizeHints(sz1, sz2)
-    # def __init__(self, parent):
-    #     archive_project_GUI.ArchiveGUI.__init__(self, parent)
-    #     self.Fit()
-
-    # def schematics_toggle(self, event):
-    #     if self.m_chkbox_sch.GetValue():
-    #         self.m_chkbox_pdf.Enable()
-    #     else:
-    #         self.m_chkbox_pdf.Disable()
-
-    #     event.Skip()
 
 class Kisandwich(pcbnew.ActionPlugin):
     def defaults(self):
@@ -96,9 +75,7 @@ class Kisandwich(pcbnew.ActionPlugin):
                 os.path.dirname(__file__), 'kisandwich_ico.png')
 
     def Run(self):
-        from importlib import reload
-        import kisandwich, kisandwich.core
-        # reload(kisandwich)
+        import kisandwich.core
         reload(kisandwich.core)
 
         # load board
@@ -112,15 +89,6 @@ class Kisandwich(pcbnew.ActionPlugin):
         main_dialog = KisandwichDialog(_pcbnew_frame)
         main_res = main_dialog.ShowModal()
 
-        # sanitize values
-        if main_dialog.m_chkbox_saving.GetValue():
-            files = dict(
-                TOP=os.path.abspath(main_dialog.m_filePicker_TOP.GetPath()),
-                LOW=os.path.abspath(main_dialog.m_filePicker_LOW.GetPath())
-            )
-        else:
-            files = dict(TOP=None, LOW=None)
-
         if main_res == wx.ID_OK:
             # notify('OK')
             pass
@@ -128,12 +96,19 @@ class Kisandwich(pcbnew.ActionPlugin):
             # notify('CANCEL')
             return
 
-        script_kw = dict(refresh=main_dialog.m_chkbox_updating.GetValue())
-        if main_dialog.m_radioBtn_TOP.GetValue():
+        # sanitize values
+        sel = main_dialog.get_user_selections()
+        if sel['saving']:
+            files = sel['files']
+        else:
+            files = dict(TOP=None, LOW=None)
+
+        script_kw = dict(refresh=sel['refreshing'])
+        if sel['wich'] == 'TOP':
             sandwich_from_gui('TOP', outfile=files['TOP'], **script_kw)
-        elif main_dialog.m_radioBtn_LOW.GetValue():
+        elif sel['wich'] == 'LOW':
             sandwich_from_gui('LOW', outfile=files['LOW'], **script_kw)
-        elif main_dialog.m_radioBtn_BOTH.GetValue():
+        elif sel['wich'] == 'BOTH':
             assert not script_kw['refresh']
             sandwich_from_gui('TOP', outfile=files['TOP'], **script_kw)
             sandwich_from_gui('LOW', outfile=files['LOW'], **script_kw)
