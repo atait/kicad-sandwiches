@@ -17,7 +17,7 @@ class KisandwichDialog(KisandwichGUI):
         self.livepcb = pcbnew.GetBoard()
         pcbpath = self.livepcb.GetFileName()
         self.m_bitmap1.SetBitmap(wx.Bitmap(
-            os.path.join(os.path.dirname(__file__), 'kisandwich_ico.png'), wx.BITMAP_TYPE_ANY
+            os.path.join(os.path.dirname(__file__), 'icons/sandwich-32.png'), wx.BITMAP_TYPE_ANY
         ))
         # self.livefile = base_to_default_boardfile(pcbpath, 'temp')
         # self.Bind(wx.EVT_CLOSE, self.OnQuit)
@@ -58,11 +58,12 @@ class KisandwichDialog(KisandwichGUI):
         elif self.m_radioBtn_BOTH.GetValue():
             sel['wich'] = 'BOTH'
         sel['files'] = dict(
-            TOP=os.path.abspath(main_dialog.m_filePicker_TOP.GetPath()),
-            LOW=os.path.abspath(main_dialog.m_filePicker_LOW.GetPath())
+            TOP=os.path.abspath(self.m_filePicker_TOP.GetPath()),
+            LOW=os.path.abspath(self.m_filePicker_LOW.GetPath())
         )
         sel['saving'] = bool(self.m_chkbox_saving.GetValue())
         sel['refreshing'] = bool(self.m_chkbox_updating.GetValue())
+        return sel
 
 
 class Kisandwich(pcbnew.ActionPlugin):
@@ -72,7 +73,7 @@ class Kisandwich(pcbnew.ActionPlugin):
         self.description = "Create multi-PCB projects"
         self.show_toolbar_button = True # Optional, defaults to False
         self.icon_file_name = os.path.join(
-                os.path.dirname(__file__), 'kisandwich_ico.png')
+                os.path.dirname(__file__), 'icons/sandwich-32.png')
 
     def Run(self):
         import kisandwich.core
