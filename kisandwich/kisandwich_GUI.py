@@ -1,0 +1,373 @@
+# -*- coding: utf-8 -*-
+
+###########################################################################
+## Python code generated with wxFormBuilder (version 3.9.0 Feb  2 2021)
+## http://www.wxformbuilder.org/
+##
+## PLEASE DO *NOT* EDIT THIS FILE!
+###########################################################################
+
+import wx
+import wx.xrc
+
+###########################################################################
+## Class KisandwichGUI
+###########################################################################
+
+class KisandwichGUI ( wx.Dialog ):
+
+    def __init__( self, parent ):
+        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"Kisandwich", pos = wx.Point( 100,100 ), size = wx.Size( 400,500 ), style = wx.DEFAULT_DIALOG_STYLE|wx.BORDER_THEME|wx.TAB_TRAVERSAL )
+
+        self.SetSizeHints( wx.DefaultSize, wx.DefaultSize )
+
+        bSizer1 = wx.BoxSizer( wx.VERTICAL )
+
+        self.m_bitmap1 = wx.StaticBitmap( self, wx.ID_ANY, wx.NullBitmap, wx.DefaultPosition, wx.DefaultSize, 0 )
+        bSizer1.Add( self.m_bitmap1, 0, wx.ALIGN_RIGHT|wx.ALL, 5 )
+
+        sbSizer1 = wx.StaticBoxSizer( wx.StaticBox( self, wx.ID_ANY, u"Wich board" ), wx.VERTICAL )
+
+        bSizer3 = wx.BoxSizer( wx.HORIZONTAL )
+
+        self.m_radioBtn_TOP = wx.RadioButton( sbSizer1.GetStaticBox(), wx.ID_ANY, u"Top", wx.DefaultPosition, wx.DefaultSize, wx.RB_GROUP )
+        self.m_radioBtn_TOP.SetMinSize( wx.Size( 100,-1 ) )
+
+        bSizer3.Add( self.m_radioBtn_TOP, 0, wx.EXPAND, 5 )
+
+        self.m_filePicker_TOP = wx.FilePickerCtrl( sbSizer1.GetStaticBox(), wx.ID_ANY, u"/home/atait/Documents/git-research/github-various/wxFormBuilder/.gitignore", u"Select a file", u"*.kicad_pcb", wx.DefaultPosition, wx.DefaultSize, wx.FLP_SAVE|wx.FLP_SMALL|wx.FLP_USE_TEXTCTRL )
+        self.m_filePicker_TOP.SetMinSize( wx.Size( 300,-1 ) )
+
+        bSizer3.Add( self.m_filePicker_TOP, 0, wx.ALL, 5 )
+
+
+        sbSizer1.Add( bSizer3, 1, wx.EXPAND, 5 )
+
+        bSizer31 = wx.BoxSizer( wx.HORIZONTAL )
+
+        self.m_radioBtn_LOW = wx.RadioButton( sbSizer1.GetStaticBox(), wx.ID_ANY, u"Low", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_radioBtn_LOW.SetMinSize( wx.Size( 100,-1 ) )
+
+        bSizer31.Add( self.m_radioBtn_LOW, 0, wx.EXPAND, 5 )
+
+        self.m_filePicker_LOW = wx.FilePickerCtrl( sbSizer1.GetStaticBox(), wx.ID_ANY, u"/home/atait/Documents/git-research/github-various/wxFormBuilder/.gitignore", u"Select a file", u"*.kicad_pcb", wx.DefaultPosition, wx.DefaultSize, wx.FLP_SAVE|wx.FLP_SMALL|wx.FLP_USE_TEXTCTRL )
+        self.m_filePicker_LOW.SetMinSize( wx.Size( 300,-1 ) )
+
+        bSizer31.Add( self.m_filePicker_LOW, 0, wx.ALL, 5 )
+
+
+        sbSizer1.Add( bSizer31, 1, wx.EXPAND, 5 )
+
+        bSizer311 = wx.BoxSizer( wx.HORIZONTAL )
+
+        self.m_radioBtn_BOTH = wx.RadioButton( sbSizer1.GetStaticBox(), wx.ID_ANY, u"Both", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_radioBtn_BOTH.SetMinSize( wx.Size( 100,-1 ) )
+
+        bSizer311.Add( self.m_radioBtn_BOTH, 0, wx.EXPAND, 5 )
+
+
+        sbSizer1.Add( bSizer311, 1, wx.EXPAND, 5 )
+
+
+        bSizer1.Add( sbSizer1, 1, wx.ALL, 5 )
+
+        sbSizer2 = wx.StaticBoxSizer( wx.StaticBox( self, wx.ID_ANY, u"Processor Settings" ), wx.HORIZONTAL )
+
+        bSizer15 = wx.BoxSizer( wx.VERTICAL )
+
+        self.m_checkBox8 = wx.CheckBox( sbSizer2.GetStaticBox(), wx.ID_ANY, u"Tracks", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_checkBox8.SetValue(True)
+        bSizer15.Add( self.m_checkBox8, 0, wx.SHAPED, 5 )
+
+        self.m_checkBox9 = wx.CheckBox( sbSizer2.GetStaticBox(), wx.ID_ANY, u"Drawings", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_checkBox9.SetValue(True)
+        bSizer15.Add( self.m_checkBox9, 0, wx.SHAPED, 5 )
+
+        self.m_checkBox10 = wx.CheckBox( sbSizer2.GetStaticBox(), wx.ID_ANY, u"Modules", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_checkBox10.SetValue(True)
+        bSizer15.Add( self.m_checkBox10, 0, wx.SHAPED, 5 )
+
+        self.m_checkBox101 = wx.CheckBox( sbSizer2.GetStaticBox(), wx.ID_ANY, u"Buried Vias", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_checkBox101.SetValue(True)
+        bSizer15.Add( self.m_checkBox101, 0, wx.SHAPED, 5 )
+
+        self.m_checkBox14 = wx.CheckBox( sbSizer2.GetStaticBox(), wx.ID_ANY, u"Bond Vias", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_checkBox14.SetValue(True)
+        bSizer15.Add( self.m_checkBox14, 0, wx.SHAPED, 5 )
+
+
+        sbSizer2.Add( bSizer15, 1, wx.EXPAND, 5 )
+
+        gSizer1 = wx.GridSizer( 3, 3, 0, 0 )
+
+        self.m_staticText4 = wx.StaticText( sbSizer2.GetStaticBox(), wx.ID_ANY, u"BP coverage", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText4.Wrap( -1 )
+
+        gSizer1.Add( self.m_staticText4, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT, 5 )
+
+        self.m_textCtrl1 = wx.TextCtrl( sbSizer2.GetStaticBox(), wx.ID_ANY, u"1.1", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_textCtrl1.Enable( False )
+
+        gSizer1.Add( self.m_textCtrl1, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+
+        self.m_staticText10 = wx.StaticText( sbSizer2.GetStaticBox(), wx.ID_ANY, u"Minimum", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText10.Wrap( -1 )
+
+        self.m_staticText10.SetFont( wx.Font( wx.NORMAL_FONT.GetPointSize(), wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, True, wx.EmptyString ) )
+
+        gSizer1.Add( self.m_staticText10, 0, wx.ALIGN_BOTTOM|wx.ALIGN_CENTER_HORIZONTAL, 5 )
+
+        self.m_staticText5 = wx.StaticText( sbSizer2.GetStaticBox(), wx.ID_ANY, u"BP diam.", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText5.Wrap( -1 )
+
+        gSizer1.Add( self.m_staticText5, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT, 5 )
+
+        self.m_textCtrl11 = wx.TextCtrl( sbSizer2.GetStaticBox(), wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_textCtrl11.Enable( False )
+
+        gSizer1.Add( self.m_textCtrl11, 0, wx.ALL, 5 )
+
+        self.m_textCtrl111 = wx.TextCtrl( sbSizer2.GetStaticBox(), wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_textCtrl111.Enable( False )
+
+        gSizer1.Add( self.m_textCtrl111, 0, wx.ALL, 5 )
+
+        self.m_staticText51 = wx.StaticText( sbSizer2.GetStaticBox(), wx.ID_ANY, u"BP drill", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText51.Wrap( -1 )
+
+        gSizer1.Add( self.m_staticText51, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT, 5 )
+
+        self.m_textCtrl12 = wx.TextCtrl( sbSizer2.GetStaticBox(), wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_textCtrl12.Enable( False )
+
+        gSizer1.Add( self.m_textCtrl12, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+
+        self.m_textCtrl121 = wx.TextCtrl( sbSizer2.GetStaticBox(), wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_textCtrl121.Enable( False )
+
+        gSizer1.Add( self.m_textCtrl121, 0, wx.ALL, 5 )
+
+
+        sbSizer2.Add( gSizer1, 1, 0, 5 )
+
+
+        sbSizer2.Add( ( 0, 0), 1, wx.EXPAND, 5 )
+
+
+        bSizer1.Add( sbSizer2, 1, wx.ALL, 5 )
+
+        bSizer10 = wx.BoxSizer( wx.HORIZONTAL )
+
+        self.m_chkbox_updating = wx.CheckBox( self, wx.ID_ANY, u"Update window", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_chkbox_updating.SetValue(True)
+        bSizer10.Add( self.m_chkbox_updating, 0, wx.ALL, 5 )
+
+        self.m_chkbox_saving = wx.CheckBox( self, wx.ID_ANY, u"Save to file", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_chkbox_saving.SetValue(True)
+        bSizer10.Add( self.m_chkbox_saving, 0, wx.ALL, 5 )
+
+
+        bSizer1.Add( bSizer10, 1, wx.ALIGN_CENTER, 5 )
+
+        m_sdbSizer1 = wx.StdDialogButtonSizer()
+        self.m_sdbSizer1OK = wx.Button( self, wx.ID_OK )
+        m_sdbSizer1.AddButton( self.m_sdbSizer1OK )
+        self.m_sdbSizer1Cancel = wx.Button( self, wx.ID_CANCEL )
+        m_sdbSizer1.AddButton( self.m_sdbSizer1Cancel )
+        m_sdbSizer1.Realize();
+
+        bSizer1.Add( m_sdbSizer1, 1, wx.ALIGN_CENTER_HORIZONTAL, 5 )
+
+
+        self.SetSizer( bSizer1 )
+        self.Layout()
+
+        self.Centre( wx.BOTH )
+
+        # Connect Events
+        self.Bind( wx.EVT_CHAR_HOOK, self.on_char )
+        self.Bind( wx.EVT_CLOSE, self.execute )
+        self.m_radioBtn_TOP.Bind( wx.EVT_RADIOBUTTON, self.on_radioboth )
+        self.m_radioBtn_LOW.Bind( wx.EVT_RADIOBUTTON, self.on_radioboth )
+        self.m_radioBtn_BOTH.Bind( wx.EVT_RADIOBUTTON, self.on_radioboth )
+        self.m_chkbox_updating.Bind( wx.EVT_CHECKBOX, self.on_updating )
+        self.m_chkbox_saving.Bind( wx.EVT_CHECKBOX, self.on_saving )
+        self.m_sdbSizer1Cancel.Bind( wx.EVT_BUTTON, self.cancel )
+        self.m_sdbSizer1OK.Bind( wx.EVT_BUTTON, self.execute )
+
+    def __del__( self ):
+        pass
+
+
+    # Virtual event handlers, overide them in your derived class
+    def on_char( self, event ):
+        event.Skip()
+
+    def execute( self, event ):
+        event.Skip()
+
+    def on_radioboth( self, event ):
+        event.Skip()
+
+
+
+    def on_updating( self, event ):
+        event.Skip()
+
+    def on_saving( self, event ):
+        event.Skip()
+
+    def cancel( self, event ):
+        event.Skip()
+
+
+
+###########################################################################
+## Class KisandwichGUIFrame
+###########################################################################
+
+class KisandwichGUIFrame ( wx.Frame ):
+
+    def __init__( self, parent ):
+        wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = u"kisandwich", pos = wx.DefaultPosition, size = wx.Size( 431,369 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
+
+        self.SetSizeHints( wx.DefaultSize, wx.DefaultSize )
+
+        bSizer1 = wx.BoxSizer( wx.VERTICAL )
+
+        bSizer2 = wx.BoxSizer( wx.VERTICAL )
+
+        self.m_staticText1 = wx.StaticText( self, wx.ID_ANY, u"Which board", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText1.Wrap( -1 )
+
+        bSizer2.Add( self.m_staticText1, 0, wx.ALL, 5 )
+
+        bSizer3 = wx.BoxSizer( wx.HORIZONTAL )
+
+        self.m_radioBtn_TOP = wx.RadioButton( self, wx.ID_ANY, u"Top", wx.DefaultPosition, wx.DefaultSize, wx.RB_GROUP )
+        self.m_radioBtn_TOP.SetMinSize( wx.Size( 150,-1 ) )
+
+        bSizer3.Add( self.m_radioBtn_TOP, 0, wx.EXPAND, 5 )
+
+        self.m_filePicker_TOP = wx.FilePickerCtrl( self, wx.ID_ANY, u"/home/atait/Documents/git-research/github-various/wxFormBuilder/.gitignore", u"Select a file", u"*.kicad_pcb", wx.DefaultPosition, wx.DefaultSize, wx.FLP_SAVE|wx.FLP_SMALL|wx.FLP_USE_TEXTCTRL )
+        self.m_filePicker_TOP.SetMinSize( wx.Size( 300,-1 ) )
+
+        bSizer3.Add( self.m_filePicker_TOP, 0, wx.ALL, 5 )
+
+
+        bSizer2.Add( bSizer3, 1, wx.EXPAND, 5 )
+
+        bSizer31 = wx.BoxSizer( wx.HORIZONTAL )
+
+        self.m_radioBtn_LOW = wx.RadioButton( self, wx.ID_ANY, u"Low", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_radioBtn_LOW.SetMinSize( wx.Size( 150,-1 ) )
+
+        bSizer31.Add( self.m_radioBtn_LOW, 0, wx.EXPAND, 5 )
+
+        self.m_filePicker_LOW = wx.FilePickerCtrl( self, wx.ID_ANY, u"/home/atait/Documents/git-research/github-various/wxFormBuilder/.gitignore", u"Select a file", u"*.kicad_pcb", wx.DefaultPosition, wx.DefaultSize, wx.FLP_SAVE|wx.FLP_SMALL|wx.FLP_USE_TEXTCTRL )
+        self.m_filePicker_LOW.SetMinSize( wx.Size( 300,-1 ) )
+
+        bSizer31.Add( self.m_filePicker_LOW, 0, wx.ALL, 5 )
+
+
+        bSizer2.Add( bSizer31, 1, wx.EXPAND, 5 )
+
+        bSizer311 = wx.BoxSizer( wx.HORIZONTAL )
+
+        self.m_radioBtn_BOTH = wx.RadioButton( self, wx.ID_ANY, u"Both", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_radioBtn_BOTH.SetMinSize( wx.Size( 150,-1 ) )
+
+        bSizer311.Add( self.m_radioBtn_BOTH, 0, wx.EXPAND, 5 )
+
+
+        bSizer2.Add( bSizer311, 1, wx.EXPAND, 5 )
+
+
+        bSizer1.Add( bSizer2, 1, wx.ALIGN_CENTER_HORIZONTAL, 5 )
+
+        bSizer10 = wx.BoxSizer( wx.HORIZONTAL )
+
+        self.m_chkbox_updating = wx.CheckBox( self, wx.ID_ANY, u"Update window", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_chkbox_updating.SetValue(True)
+        bSizer10.Add( self.m_chkbox_updating, 0, wx.ALL, 5 )
+
+        self.m_chkbox_saving = wx.CheckBox( self, wx.ID_ANY, u"Save to file", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_chkbox_saving.SetValue(True)
+        bSizer10.Add( self.m_chkbox_saving, 0, wx.ALL, 5 )
+
+        self.m_chkbox_vrmling = wx.CheckBox( self, wx.ID_ANY, u"Export VRMLs", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_chkbox_vrmling.Enable( False )
+
+        bSizer10.Add( self.m_chkbox_vrmling, 0, wx.ALL, 5 )
+
+
+        bSizer1.Add( bSizer10, 1, wx.ALIGN_CENTER, 5 )
+
+        bSizer11 = wx.BoxSizer( wx.HORIZONTAL )
+
+        self.m_staticText2 = wx.StaticText( self, wx.ID_ANY, u"Processing:", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText2.Wrap( -1 )
+
+        bSizer11.Add( self.m_staticText2, 0, wx.ALIGN_CENTER_VERTICAL, 5 )
+
+        m_choice1Choices = [ u"All", u"Tracks", u"Vias" ]
+        self.m_choice1 = wx.Choice( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, m_choice1Choices, 0 )
+        self.m_choice1.SetSelection( 0 )
+        self.m_choice1.Enable( False )
+
+        bSizer11.Add( self.m_choice1, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+
+
+        bSizer1.Add( bSizer11, 1, wx.ALIGN_CENTER_HORIZONTAL|wx.ALL, 5 )
+
+        m_sdbSizer1 = wx.StdDialogButtonSizer()
+        self.m_sdbSizer1OK = wx.Button( self, wx.ID_OK )
+        m_sdbSizer1.AddButton( self.m_sdbSizer1OK )
+        self.m_sdbSizer1Cancel = wx.Button( self, wx.ID_CANCEL )
+        m_sdbSizer1.AddButton( self.m_sdbSizer1Cancel )
+        m_sdbSizer1.Realize();
+
+        bSizer1.Add( m_sdbSizer1, 1, wx.ALIGN_CENTER_HORIZONTAL, 5 )
+
+
+        self.SetSizer( bSizer1 )
+        self.Layout()
+
+        self.Centre( wx.BOTH )
+
+        # Connect Events
+        self.m_radioBtn_TOP.Bind( wx.EVT_RADIOBUTTON, self.on_radioboth )
+        self.m_radioBtn_LOW.Bind( wx.EVT_RADIOBUTTON, self.on_radioboth )
+        self.m_radioBtn_BOTH.Bind( wx.EVT_RADIOBUTTON, self.on_radioboth )
+        self.m_chkbox_updating.Bind( wx.EVT_CHECKBOX, self.on_updating )
+        self.m_chkbox_saving.Bind( wx.EVT_CHECKBOX, self.on_saving )
+        self.m_chkbox_vrmling.Bind( wx.EVT_CHECKBOX, self.on_vrmling )
+        self.m_sdbSizer1Cancel.Bind( wx.EVT_BUTTON, self.cancel )
+        self.m_sdbSizer1OK.Bind( wx.EVT_BUTTON, self.execute )
+
+    def __del__( self ):
+        pass
+
+
+    # Virtual event handlers, overide them in your derived class
+    def on_radioboth( self, event ):
+        event.Skip()
+
+
+
+    def on_updating( self, event ):
+        event.Skip()
+
+    def on_saving( self, event ):
+        event.Skip()
+
+    def on_vrmling( self, event ):
+        event.Skip()
+
+    def cancel( self, event ):
+        event.Skip()
+
+    def execute( self, event ):
+        event.Skip()
+
+
