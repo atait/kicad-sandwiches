@@ -7,7 +7,8 @@
     - To reload every time an action plugin is run, put the command in its "Run" method
 
 '''
-import sys
+from functools import wraps
+import sys, os
 try:
     from importlib import reload
 except ImportError:
@@ -20,8 +21,6 @@ except ImportError:
             raise NameError('Could not determine reload command\nPython: ' + sys.version)
 
 # Fix paths
-
-import os
 path_kisandwiches = os.path.dirname(__file__)
 if path_kisandwiches not in sys.path:
     sys.path.append(path_kisandwiches)
@@ -63,6 +62,26 @@ def expose_kicad_python():
             'Download from "https://github.com/KiCad/kicad-python" with\n'
             'cd {}\ngit clone git@github.com:KiCad/kicad-python.git'.format(path_kicad_user_scripting)
         )
+
+def requires_kicad_python(*possiblefunc, autoreload=False):
+    if len(possiblefunc) == 0:
+        return lambda func: requires_kicad_python(func, autoreload=autoreload)
+    elif len(possiblefunc) == 1 and callable(possiblefunc[0]):
+        func = possiblefunc[0]
+        @wraps(func)
+        def wrapped(*args, **kwargs):
+            expose_kicad_python()
+            if autoreload:
+                from kicad.pcbnew import drawing, module, board, layer
+                reload(drawing)
+                reload(module)
+                reload(board)
+                reload(layer)
+            return func(*args, **kwargs)
+        return wrapped
+    else:
+        raise ValueError('Invalid number of arguments')
+
 
 # Messages
 def notify(*args):

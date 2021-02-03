@@ -26,61 +26,62 @@
     - to reinit that module, use "reload(that_module)"
     The entry point will reload this script, thus reinitializing and running it every time
 '''
-import setup_pcbnew_coding_alex  # setup paths
-from importlib import reload
+from atait_scripting_support import reload, notify, expose_kicad_python, requires_kicad_python
+import sys
 import time
 
-### the most basic test of paths and links working correctly
-def most_basic_test():
+def default():
+    notify(
+        'This is kicad-sandwiches, the one-push macro script. '
+        'Edit the script directly at \n\n{}\n\n'
+        'Use it to develop your own code without '
+        'having to restart pcbnew every time.'.format(__file__)
+    )
+default()  # Comment this line when ready to run your own code below
+
+### the most basic test that paths and links and board loading are working correctly
+def hello_world():
     import pcbnew
-    print("Testing onepush")
+    notify("One push hello world")
     board = pcbnew.GetBoard()
     textobj = pcbnew.TEXTE_PCB(board)
-    textobj.SetPosition(pcbnew.wxPoint(pcbnew.FromMils(2000), pcbnew.FromMils(1000)))
-    textobj.SetText('Testing onepush')
+    textobj.SetPosition(pcbnew.wxPoint(pcbnew.FromMils(0), pcbnew.FromMils(0)))
+    textobj.SetText('One push hello world')
     textobj.SetLayer(pcbnew.Cmts_User)
     board.Add(textobj)
-# most_basic_test()
-###
+# hello_world()
 
 
-#### communicate with the user
-import wx
-def notify(text):
-    text = str(text)
-    dialog = wx.MessageDialog(None, text, 'One Push debug output', wx.OK)
-    sg = dialog.ShowModal()
-    return sg
-# test it
-# notify('heyooo thereo')
-# notify('heyoee again')
 
 #### some tests of kicad-python
-import kicad
-from kicad.pcbnew import drawing, module, board, layer
-reload(kicad)
-reload(drawing)
-reload(module)
-reload(board)
-from kicad.pcbnew.layer import Layer
-from kicad.pcbnew.board import Board
-pcb = Board.from_editor()
 
-# # These have to do with editing modules
-# # mod = pcb.add_module('test')
-# # modline = drawing.Segment(start=(-8, 0), end=(8, 0), width=0.2, layer='F.SilkS', board=mod)
-# # mod.add_line(start=(-8, 0), end=(8, 0), layer='F.SilkS', width=0.2)
-# # mod.add(modline)
-# # modarc = drawing.Arc([0, 0], 6, start_angle=0, stop_angle=180, layer='F.Cu', width=0.15, board=pcb)
-# # mod.add(modarc)
-# # m.add_pad(position=(-4, -3), size=2, drill=1)
-# # m.add_pad(position=(4, -3), size=2, drill=1, layers=['B.Cu', 'F.Cu'])
-# # for n, x in enumerate([-1, -.5, 0, .5, 1]):
-# #     m.add_pad(position=(x, -4), size=(0.25, 1.2), name=n, pad_type='smd', shape='rect')
+# Verify autoreloading
+@requires_kicad_python(autoreload=True)
+def test_autoreload():
+    from kicad.pcbnew.board import Board
+    pcb = Board.from_editor()
+    try:
+        notify(pcb.temporary_attribute)
+    except AttributeError:
+        notify(
+'''
+Add the attribute to kicad.pcbnew.board:Board at this line:
 
-# # get a module already present and move it
-# mod = pcb.moduleByRef('U1')
-# mod.position = (50, 30)
+class Board(object):
+    temporary_attribute = 'hey there'
+    def __init__(self, wrap=None):
+'''
+        )
+# test_autoreload()
+
+# get a module already present and move it
+@requires_kicad_python
+def move_footprint():
+    from kicad.pcbnew.board import Board
+    pcb = Board.from_editor()
+    mod = pcb.moduleByRef('D1')
+    mod.position = (50, 30)
+# move_footprint()
 
 # # add test track with via
 # track1 = [(30, 26), (30, 50), (60, 80)]
@@ -100,7 +101,7 @@ pcb = Board.from_editor()
 #         ul]
 # pcb.add_polyline(edge, layer='Edge.Cuts')
 
-#### Reload footprints
+#### Reload main window
 import pcbnew
 pcbnew.Refresh()
 

@@ -1,7 +1,7 @@
 ''' Entry point for onepush_script.py
-    Hotkey the corresponding menu item: "One Push"
+    On OSX, you can hotkey the corresponding menu item: "One Push"
 '''
-# from atait_scripting_support import reload
+from atait_scripting_support import reload
 import pcbnew
 import os, sys
 
@@ -18,5 +18,5 @@ class OnePush(pcbnew.ActionPlugin):
     def Run(self):
         # The entry function of the plugin that is executed on user action
         import onepush_script
-        # reload(onepush_script)
+        reload(onepush_script)
 
