@@ -77,9 +77,20 @@ def process_modules(pcb, which_one='LOW'):
             pcb.remove(mod)
 
 
-def process_blind_vias(pcb, which_one='LOW'):
-    # Turn blind vias into regular vias that will likely be tented
+def process_vias(pcb, which_one='LOW',
+    coverage_ratio=1.05,
+    diameter_override=None, diameter_minimum=None,
+    drill_override=None, drill_minimum=None
+):
+    ''' 1. Turn through vias into bonding pads. They really cannot be tented (i.e. with mask opening)
+        2. Convert vias to internal layers into through vias. They can be tented.
+        Argument units in mm and pertain only to bonding pads
+        TODO: replace the bonding pads with a one-sided SMD pad so that routing can happen on the other side... This would be very confusing for DRC
+    '''
+    assert diameter_override is None or diameter_minimum is None
+    assert drill_override is None or drill_minimum is None
     for via in pcb.vias:
+        # Turn blind vias into regular vias. Delete ones in wrong layers
         if via._obj.GetViaType() in [pcbnew.VIA_MICROVIA, pcbnew.VIA_BLIND_BURIED]:
             toplayer = layer_map[which_one].get(via.top_layer, via.top_layer)
             if toplayer is None:
@@ -94,19 +105,8 @@ def process_blind_vias(pcb, which_one='LOW'):
             else:
                 via.bottom_layer = bottomlayer
                 via._obj.SetViaType(pcbnew.VIA_THROUGH)
-
-def process_vias_to_bondpads(pcb, which_one='LOW', coverage_ratio=1.05,
-    diameter_override=None, diameter_minimum=None,
-    drill_override=None, drill_minimum=None
-):
-    ''' Turn through vias into bonding pads. They really cannot be tented.
-        Units in mm
-        TODO: replace this via with a one-sided SMD pad so that routing can happen on the other side... This would be very confusing for DRC
-    '''
-    assert diameter_override is None or diameter_minimum is None
-    assert drill_override is None or drill_minimum is None
-    for via in pcb.vias:
-        if via._obj.GetViaType() == pcbnew.VIA_THROUGH:
+        # Make open bond pads
+        elif via._obj.GetViaType() == pcbnew.VIA_THROUGH:
             if diameter_override is not None:
                 via.diameter = diameter_override
             elif diameter_minimum is not None:
@@ -115,21 +115,20 @@ def process_vias_to_bondpads(pcb, which_one='LOW', coverage_ratio=1.05,
                 via.drill = drill_override
             elif drill_minimum is not None:
                 via.drill = max(via.drill, drill_minimum)
-            radius = coverage_ratio * via.diameter / 4
-            width = 2 * radius
+            opening_radius = coverage_ratio * via.diameter / 4
+            opening_width = 2 * opening_radius
             pcb.add_circle(
                 via.center,
-                radius,
+                opening_radius,
                 'F.Mask' if which_one == 'LOW' else 'B.Mask',
-                width)
+                opening_width)
 
 
 def process_all(pcb, which_one='LOW'):
     process_tracks(pcb, which_one)
     process_drawings(pcb, which_one)
     process_modules(pcb, which_one)
-    process_blind_vias(pcb, which_one)
-    process_vias_to_bondpads(pcb, which_one)
+    process_vias(pcb, which_one)
 
 
 ### Entry points
