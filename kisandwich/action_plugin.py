@@ -39,11 +39,6 @@ class KisandwichDialog(KisandwichGUI):
         event.Skip()
 
     def on_saving( self, event ):
-        if self.m_chkbox_saving.GetValue():
-            self.m_chkbox_vrmling.Enable()
-        else:
-            self.m_chkbox_vrmling.SetValue(False)
-            self.m_chkbox_vrmling.Disable()
         event.Skip()
 
     def on_updating( self, event ):
@@ -63,6 +58,12 @@ class KisandwichDialog(KisandwichGUI):
         )
         sel['saving'] = bool(self.m_chkbox_saving.GetValue())
         sel['refreshing'] = bool(self.m_chkbox_updating.GetValue())
+        sel['proc_opts'] = dict(
+            tracks=bool(self.m_optTracks.GetValue()),
+            drawings=bool(self.m_optDrawings.GetValue()),
+            modules=bool(self.m_optModules.GetValue()),
+            vias=bool(self.m_optVias.GetValue())
+        )
         return sel
 
 
@@ -104,7 +105,7 @@ class Kisandwich(pcbnew.ActionPlugin):
         else:
             files = dict(TOP=None, LOW=None)
 
-        script_kw = dict(refresh=sel['refreshing'])
+        script_kw = dict(refresh=sel['refreshing'], proc_opts=sel['proc_opts'])
         if sel['wich'] == 'TOP':
             sandwich_from_gui('TOP', outfile=files['TOP'], **script_kw)
         elif sel['wich'] == 'LOW':

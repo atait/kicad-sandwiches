@@ -124,18 +124,23 @@ def process_vias(pcb, which_one='LOW',
                 opening_width)
 
 
-def process_all(pcb, which_one='LOW'):
-    process_tracks(pcb, which_one)
-    process_drawings(pcb, which_one)
-    process_modules(pcb, which_one)
-    process_vias(pcb, which_one)
+def process_all(pcb, which_one='LOW', proc_opts=None):
+    ''' proc_opts is a dictionary with either functions or strings describing the steps to take '''
+    if proc_opts is None or proc_opts.get('tracks', False):
+        process_tracks(pcb, which_one)
+    if proc_opts is None or proc_opts.get('drawings', False):
+        process_drawings(pcb, which_one)
+    if proc_opts is None or proc_opts.get('modules', False):
+        process_modules(pcb, which_one)
+    if proc_opts is None or proc_opts.get('vias', False):
+        process_vias(pcb, which_one)
 
 
 ### Entry points
-def sandwich_from_gui(which_one='LOW', refresh=False, outfile=None):
+def sandwich_from_gui(which_one='LOW', refresh=False, outfile=None, proc_opts=None):
     livepcb = Board.from_editor()
     if refresh:
-        process_all(livepcb, which_one)
+        process_all(livepcb, which_one, proc_opts)
         pcbnew.Refresh()
         if outfile is not None:
             livepcb.save(outfile)
@@ -144,7 +149,7 @@ def sandwich_from_gui(which_one='LOW', refresh=False, outfile=None):
         livepcb.save(tempfile)
         try:
             workingpcb = Board.load(tempfile)
-            process_all(workingpcb, which_one)
+            process_all(workingpcb, which_one, proc_opts)
             workingpcb.save(outfile)
         finally:
             os.remove(tempfile)
