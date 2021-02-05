@@ -9,5 +9,6 @@ __pycache__
 # Backups
 *.kicad_pcb-bak
 *.sch-bak
+*.FCStd1
 
 *.log
