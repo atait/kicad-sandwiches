@@ -33,7 +33,7 @@ The reason for doing this is that blind vias make sense (except blind vias betwe
 Using the kisandwich plugin, this "board" is converted to two other files corresponding to the actual 2-layer boards: "kisandwich-out/sandwich-example-sandwich_\[LOW|TOP\].kicad_pcb". The plugin is activated with the ![sandwich](kisandwich/icons/sandwich-32.png) button, which gives a dialog with various options.
 
 #### The 3D model
-In the same directory, these are exported to STEP models. The STEP models are assembled together in FreeCAD in the file "FreeCAD-out/stack-3dModel.FCStd". In FreeCAD, the lower board is translated down by one board thickness, and their appearances can be altered. VRML can also be used for detail on traces, although appearances can't be changed. Finally, a snapshot of the FreeCAD assembly is included in "FreeCAD-out/assembled-snapshot.png".
+In the same directory, these are exported to VRML (.wrl) models. The models are assembled together in FreeCAD in the file "FreeCAD-out/stack-3dModel.FCStd". In FreeCAD, the lower board is translated down by one board thickness, and their appearances can be altered. Finally, a snapshot of the FreeCAD assembly is included in "FreeCAD-out/assembled-snapshot.png".
 
 ## Todo
 1. Options for adding a bonding ring around the perimeter
@@ -48,3 +48,7 @@ On the way...
 I anticipate this will yield some information about bond pad design and a fair amount of monkeying with an oven. A good tip seems to be getting the pick-and-place to use lead-free solder, then using leaded solder for bonding because it has a lower melting point.
 
 What is the alignment tolerance? This will affect the size of bond pads.
+
+
+## Bonus: One push
+KiCAD does not have a great notion of a macro - scripts that you can run repeatedly while editing them on the fly. The onepush plugin gives a button that runs a particular file in "onepush_script.py". Any edits to this file are reloaded when the button is pushed. It can import other code such as libraries you are debugging. These libraries can also be reloaded on the fly using `reload` commands. Refer to the plugin files for more instructions.

@@ -6,6 +6,14 @@ Transform {
   scale 2.54 2.54 2.54
   children [
 Transform {
+  translation 64.1756 -37.95 0.314961
+  scale 1 1 1
+  children [
+    Inline {
+      url "shapes3D/SOIC-8_3.9x4.9mm_P1.27mm.wrl"
+    } ]
+  }
+Transform {
   children [
     Group {
       children [
