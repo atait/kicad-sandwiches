@@ -17,7 +17,7 @@ import wx.xrc
 class KisandwichGUI ( wx.Dialog ):
 
     def __init__( self, parent ):
-        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"Kisandwich", pos = wx.Point( 100,100 ), size = wx.Size( 400,500 ), style = wx.DEFAULT_DIALOG_STYLE|wx.BORDER_THEME|wx.TAB_TRAVERSAL )
+        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"Kisandwich", pos = wx.Point( 100,100 ), size = wx.Size( 465,500 ), style = wx.DEFAULT_DIALOG_STYLE|wx.BORDER_THEME|wx.TAB_TRAVERSAL )
 
         self.SetSizeHints( wx.DefaultSize, wx.DefaultSize )
 
@@ -36,7 +36,7 @@ class KisandwichGUI ( wx.Dialog ):
         bSizer3.Add( self.m_radioBtn_TOP, 0, wx.EXPAND, 5 )
 
         self.m_filePicker_TOP = wx.FilePickerCtrl( sbSizer1.GetStaticBox(), wx.ID_ANY, u"/home/atait/Documents/git-research/github-various/wxFormBuilder/.gitignore", u"Select a file", u"*.kicad_pcb", wx.DefaultPosition, wx.DefaultSize, wx.FLP_SAVE|wx.FLP_SMALL|wx.FLP_USE_TEXTCTRL )
-        self.m_filePicker_TOP.SetMinSize( wx.Size( 300,-1 ) )
+        self.m_filePicker_TOP.SetMinSize( wx.Size( 320,-1 ) )
 
         bSizer3.Add( self.m_filePicker_TOP, 0, wx.ALL, 5 )
 
@@ -51,7 +51,7 @@ class KisandwichGUI ( wx.Dialog ):
         bSizer31.Add( self.m_radioBtn_LOW, 0, wx.EXPAND, 5 )
 
         self.m_filePicker_LOW = wx.FilePickerCtrl( sbSizer1.GetStaticBox(), wx.ID_ANY, u"/home/atait/Documents/git-research/github-various/wxFormBuilder/.gitignore", u"Select a file", u"*.kicad_pcb", wx.DefaultPosition, wx.DefaultSize, wx.FLP_SAVE|wx.FLP_SMALL|wx.FLP_USE_TEXTCTRL )
-        self.m_filePicker_LOW.SetMinSize( wx.Size( 300,-1 ) )
+        self.m_filePicker_LOW.SetMinSize( wx.Size( 320,-1 ) )
 
         bSizer31.Add( self.m_filePicker_LOW, 0, wx.ALL, 5 )
 
@@ -69,7 +69,7 @@ class KisandwichGUI ( wx.Dialog ):
         sbSizer1.Add( bSizer311, 1, wx.EXPAND, 5 )
 
 
-        bSizer1.Add( sbSizer1, 1, wx.ALL, 5 )
+        bSizer1.Add( sbSizer1, 1, wx.ALL|wx.EXPAND, 5 )
 
         sbSizer2 = wx.StaticBoxSizer( wx.StaticBox( self, wx.ID_ANY, u"Processor Settings" ), wx.HORIZONTAL )
 
@@ -94,63 +94,53 @@ class KisandwichGUI ( wx.Dialog ):
 
         sbSizer2.Add( bSizer15, 1, wx.EXPAND, 5 )
 
+
+        sbSizer2.Add( ( 0, 0), 1, wx.ALL|wx.EXPAND, 5 )
+
         gSizer1 = wx.GridSizer( 3, 3, 0, 0 )
 
-        self.m_staticText4 = wx.StaticText( sbSizer2.GetStaticBox(), wx.ID_ANY, u"BP coverage", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText4 = wx.StaticText( sbSizer2.GetStaticBox(), wx.ID_ANY, u"Bond pad solder\nmask coverage", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText4.Wrap( -1 )
 
         gSizer1.Add( self.m_staticText4, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT, 5 )
 
-        self.m_textCtrl1 = wx.TextCtrl( sbSizer2.GetStaticBox(), wx.ID_ANY, u"1.1", wx.DefaultPosition, wx.DefaultSize, 0 )
-        self.m_textCtrl1.Enable( False )
+        self.m_bpopt_maskCoverage = wx.TextCtrl( sbSizer2.GetStaticBox(), wx.ID_ANY, u"1.1", wx.DefaultPosition, wx.DefaultSize, 0 )
+        gSizer1.Add( self.m_bpopt_maskCoverage, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
 
-        gSizer1.Add( self.m_textCtrl1, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
-
-        self.m_staticText10 = wx.StaticText( sbSizer2.GetStaticBox(), wx.ID_ANY, u"Minimum", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText10 = wx.StaticText( sbSizer2.GetStaticBox(), wx.ID_ANY, u"Minima", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText10.Wrap( -1 )
 
         self.m_staticText10.SetFont( wx.Font( wx.NORMAL_FONT.GetPointSize(), wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, True, wx.EmptyString ) )
 
-        gSizer1.Add( self.m_staticText10, 0, wx.ALIGN_BOTTOM|wx.ALIGN_CENTER_HORIZONTAL, 5 )
+        gSizer1.Add( self.m_staticText10, 0, wx.ALIGN_BOTTOM|wx.ALIGN_CENTER_HORIZONTAL|wx.ALL, 5 )
 
-        self.m_staticText5 = wx.StaticText( sbSizer2.GetStaticBox(), wx.ID_ANY, u"BP diam.", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText5 = wx.StaticText( sbSizer2.GetStaticBox(), wx.ID_ANY, u"BP diam. (mm)", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText5.Wrap( -1 )
 
         gSizer1.Add( self.m_staticText5, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT, 5 )
 
-        self.m_textCtrl11 = wx.TextCtrl( sbSizer2.GetStaticBox(), wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
-        self.m_textCtrl11.Enable( False )
+        self.m_bpopt_padCoerce = wx.TextCtrl( sbSizer2.GetStaticBox(), wx.ID_ANY, u"uniform", wx.DefaultPosition, wx.DefaultSize, 0 )
+        gSizer1.Add( self.m_bpopt_padCoerce, 0, wx.ALL, 5 )
 
-        gSizer1.Add( self.m_textCtrl11, 0, wx.ALL, 5 )
+        self.m_bpopt_padMinimum = wx.TextCtrl( sbSizer2.GetStaticBox(), wx.ID_ANY, u"minimum", wx.DefaultPosition, wx.DefaultSize, 0 )
+        gSizer1.Add( self.m_bpopt_padMinimum, 0, wx.ALL, 5 )
 
-        self.m_textCtrl111 = wx.TextCtrl( sbSizer2.GetStaticBox(), wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
-        self.m_textCtrl111.Enable( False )
-
-        gSizer1.Add( self.m_textCtrl111, 0, wx.ALL, 5 )
-
-        self.m_staticText51 = wx.StaticText( sbSizer2.GetStaticBox(), wx.ID_ANY, u"BP drill", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText51 = wx.StaticText( sbSizer2.GetStaticBox(), wx.ID_ANY, u"BP drill (mm)", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText51.Wrap( -1 )
 
         gSizer1.Add( self.m_staticText51, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT, 5 )
 
-        self.m_textCtrl12 = wx.TextCtrl( sbSizer2.GetStaticBox(), wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
-        self.m_textCtrl12.Enable( False )
+        self.m_bpopt_drillCoerce = wx.TextCtrl( sbSizer2.GetStaticBox(), wx.ID_ANY, u"uniform", wx.DefaultPosition, wx.DefaultSize, 0 )
+        gSizer1.Add( self.m_bpopt_drillCoerce, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
 
-        gSizer1.Add( self.m_textCtrl12, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
-
-        self.m_textCtrl121 = wx.TextCtrl( sbSizer2.GetStaticBox(), wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
-        self.m_textCtrl121.Enable( False )
-
-        gSizer1.Add( self.m_textCtrl121, 0, wx.ALL, 5 )
+        self.m_bpopt_drillMinimum = wx.TextCtrl( sbSizer2.GetStaticBox(), wx.ID_ANY, u"minimum", wx.DefaultPosition, wx.DefaultSize, 0 )
+        gSizer1.Add( self.m_bpopt_drillMinimum, 0, wx.ALL, 5 )
 
 
         sbSizer2.Add( gSizer1, 1, 0, 5 )
 
 
-        sbSizer2.Add( ( 0, 0), 1, wx.EXPAND, 5 )
-
-
-        bSizer1.Add( sbSizer2, 1, wx.ALL, 5 )
+        bSizer1.Add( sbSizer2, 1, wx.ALL|wx.EXPAND, 5 )
 
         bSizer10 = wx.BoxSizer( wx.HORIZONTAL )
 

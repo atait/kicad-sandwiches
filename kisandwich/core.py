@@ -78,7 +78,7 @@ def process_modules(pcb, which_one='LOW'):
 
 
 def process_vias(pcb, which_one='LOW',
-    coverage_ratio=1.05,
+    coverage_ratio=1.1,
     diameter_override=None, diameter_minimum=None,
     drill_override=None, drill_minimum=None
 ):
@@ -124,7 +124,7 @@ def process_vias(pcb, which_one='LOW',
                 opening_width)
 
 
-def process_all(pcb, which_one='LOW', proc_opts=None):
+def process_all(pcb, which_one='LOW', proc_opts=None, bp_opts=None):
     ''' proc_opts is a dictionary with either functions or strings describing the steps to take '''
     if proc_opts is None or proc_opts.get('tracks', False):
         process_tracks(pcb, which_one)
@@ -133,14 +133,14 @@ def process_all(pcb, which_one='LOW', proc_opts=None):
     if proc_opts is None or proc_opts.get('modules', False):
         process_modules(pcb, which_one)
     if proc_opts is None or proc_opts.get('vias', False):
-        process_vias(pcb, which_one)
+        process_vias(pcb, which_one, **bp_opts)
 
 
 ### Entry points
-def sandwich_from_gui(which_one='LOW', refresh=False, outfile=None, proc_opts=None):
+def sandwich_from_gui(which_one='LOW', refresh=False, outfile=None, proc_opts=None, bp_opts=None):
     livepcb = Board.from_editor()
     if refresh:
-        process_all(livepcb, which_one, proc_opts)
+        process_all(livepcb, which_one, proc_opts=proc_opts, bp_opts=bp_opts)
         pcbnew.Refresh()
         if outfile is not None:
             livepcb.save(outfile)
@@ -149,7 +149,7 @@ def sandwich_from_gui(which_one='LOW', refresh=False, outfile=None, proc_opts=No
         livepcb.save(tempfile)
         try:
             workingpcb = Board.load(tempfile)
-            process_all(workingpcb, which_one, proc_opts)
+            process_all(workingpcb, which_one, proc_opts=proc_opts, bp_opts=bp_opts)
             workingpcb.save(outfile)
         finally:
             os.remove(tempfile)

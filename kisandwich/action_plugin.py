@@ -58,12 +58,26 @@ class KisandwichDialog(KisandwichGUI):
         )
         sel['saving'] = bool(self.m_chkbox_saving.GetValue())
         sel['refreshing'] = bool(self.m_chkbox_updating.GetValue())
+
         sel['proc_opts'] = dict(
             tracks=bool(self.m_optTracks.GetValue()),
             drawings=bool(self.m_optDrawings.GetValue()),
             modules=bool(self.m_optModules.GetValue()),
             vias=bool(self.m_optVias.GetValue())
         )
+
+        sel['bp_opts'] = dict(
+            coverage_ratio=float(self.m_bpopt_maskCoverage.GetValue()),
+        )
+        def default_float(textctrl, key):
+            if textctrl.GetValue() not in ['uniform', 'minimum']:
+                sel['bp_opts'][key] = float(textctrl.GetValue())
+        default_float(self.m_bpopt_maskCoverage, 'coverage_ratio')
+        default_float(self.m_bpopt_padCoerce, 'diameter_override')
+        default_float(self.m_bpopt_padMinimum, 'diameter_minimum')
+        default_float(self.m_bpopt_drillCoerce, 'drill_override')
+        default_float(self.m_bpopt_drillMinimum, 'drill_minimum')
+
         return sel
 
 
@@ -105,7 +119,7 @@ class Kisandwich(pcbnew.ActionPlugin):
         else:
             files = dict(TOP=None, LOW=None)
 
-        script_kw = dict(refresh=sel['refreshing'], proc_opts=sel['proc_opts'])
+        script_kw = dict(refresh=sel['refreshing'], proc_opts=sel['proc_opts'], bp_opts=sel['bp_opts'])
         if sel['wich'] == 'TOP':
             sandwich_from_gui('TOP', outfile=files['TOP'], **script_kw)
         elif sel['wich'] == 'LOW':
