@@ -13,7 +13,7 @@ from .gui_dialog import KisandwichGUI
 class KisandwichDialog(KisandwichGUI):
     # hack for new wxFormBuilder generating code incompatible with old wxPython
     def __init__(self, parent):
-        super().__init__(parent)
+        super(KisandwichDialog, self).__init__(parent)
         self.livepcb = pcbnew.GetBoard()
         pcbpath = self.livepcb.GetFileName()
         self.m_bitmap1.SetBitmap(wx.Bitmap(

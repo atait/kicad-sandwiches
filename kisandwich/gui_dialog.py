@@ -19,7 +19,10 @@ class KisandwichGUI ( wx.Dialog ):
     def __init__( self, parent ):
         wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"Kisandwich", pos = wx.Point( 100,100 ), size = wx.Size( 465,500 ), style = wx.DEFAULT_DIALOG_STYLE|wx.BORDER_THEME|wx.TAB_TRAVERSAL )
 
-        self.SetSizeHints( wx.DefaultSize, wx.DefaultSize )
+        try:
+            self.SetSizeHints( wx.DefaultSize, wx.DefaultSize )
+        except TypeError:
+            pass
 
         bSizer1 = wx.BoxSizer( wx.VERTICAL )
 

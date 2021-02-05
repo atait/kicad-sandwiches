@@ -63,7 +63,9 @@ def expose_kicad_python():
             'cd {}\ngit clone git@github.com:KiCad/kicad-python.git'.format(path_kicad_user_scripting)
         )
 
-def requires_kicad_python(*possiblefunc, autoreload=False):
+
+def requires_kicad_python(*possiblefunc, **kwauto):
+    autoreload = kwauto.get('autoreload', False)  # This no explicit kwargs style is required for python 2
     if len(possiblefunc) == 0:
         return lambda func: requires_kicad_python(func, autoreload=autoreload)
     elif len(possiblefunc) == 1 and callable(possiblefunc[0]):
