@@ -17,27 +17,33 @@ from kicad.pcbnew.board import Board
 layer_map = dict()
 layer_map['TOP'] = {
     'Eco1.User': 'Edge.Cuts',
+    'TOP.Cuts': 'Edge.Cuts',
 
     'In1.Cu': None,
     'In2.Cu': 'F.Cu',
     # 'B.Cu': 'B.Cu',
     'F.Cu': None,
 
+    'F.SilkS': 'F.SilkS',
     'B.SilkS': None,
-    'B.Mask': None,
+    'F.Mask': None,
+    'TOP.Mask': 'F.Mask',
     'B.Paste': None,
     'B.Adhes': None,
 }
 layer_map['LOW'] = {
     'Eco2.User': 'Edge.Cuts',
+    'LOW.Cuts': 'Edge.Cuts',
 
     'In1.Cu': 'B.Cu',
     'In2.Cu': None,
     # 'F.Cu': 'F.Cu',
     'B.Cu': None,
 
+    # 'B.SilkS': 'B.SilkS'.
     'F.SilkS': None,
-    'F.Mask': None,
+    'B.Mask': None,
+    'LOW.Mask': 'B.Mask',
     'F.Paste': None,
     'F.Adhes': None,
 }
@@ -54,6 +60,8 @@ module_map['LOW'] = {
 
 def process_tracks(pcb, which_one='LOW'):
     for tr in pcb.tracks:
+        if tr.layer.startswith('TOP'):
+            notify('Hit ' + tr.layer)
         tr_layer = layer_map[which_one].get(tr.layer, tr.layer)
         if tr_layer is None:
             pcb.remove(tr)
@@ -63,6 +71,8 @@ def process_tracks(pcb, which_one='LOW'):
 
 def process_drawings(pcb, which_one='LOW'):
     for dw in pcb.drawings:
+        if dw.layer.startswith('TOP'):
+            notify('Hit ' + dw.layer)
         dw_layer = layer_map[which_one].get(dw.layer, dw.layer)
         if dw_layer is None:
             pcb.remove(dw)
