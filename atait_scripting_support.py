@@ -20,7 +20,7 @@ except ImportError:
         except NameError as err:
             raise NameError('Could not determine reload command\nPython: ' + sys.version)
 
-# Fix paths
+# Broaden paths
 path_kisandwiches = os.path.dirname(__file__)
 if path_kisandwiches not in sys.path:
     sys.path.append(path_kisandwiches)
@@ -30,18 +30,28 @@ path_kicad_user_scripting = os.path.dirname(path_kicad_user_plugins)
 if path_kicad_user_scripting not in sys.path:
     sys.path.append(path_kicad_user_scripting)
 
-
-def in_pcbnew_interpreter():
-    try:
+# Expose pcbnew if not in application context
+try:
+    import pcbnew
+except ImportError:
+    path_pcbnew_pymodule = os.environ.get('PCBNEW_PATH', None)
+    if path_pcbnew_pymodule:
+        if os.path.basename(path_pcbnew_pymodule) != 'pcbnew.py':
+            raise EnvironmentError(
+                'Incorrect location for \'PCBNEW_PATH\' ({}).'
+                ' It should point to a file called pcbnew.py'.format(path_pcbnew_pymodule))
+        if not os.path.isfile(path_pcbnew_pymodule):
+            raise EnvironmentError(
+                'Incorrect location for \'PCBNEW_PATH\' ({}).'
+                ' File does not exist'.format(path_pcbnew_pymodule))
+        sys.path.insert(0, os.path.dirname(path_pcbnew_pymodule))
         import pcbnew
-    except ImportError:
-        return False
     else:
-        return True
+        pcbnew = None
 
 
 def expose_kicad_python():
-    if not in_pcbnew_interpreter():
+    if pcbnew is None:
         raise ImportError(
             'kicad-python can only be used within the scope of pcbnew,'
             'which is not available on command line'
@@ -52,8 +62,8 @@ def expose_kicad_python():
         pass
     else:
         return
-    sys.path.append(os.path.join(path_kicad_user_scripting, 'kicad-python'))
-    sys.path.append(os.path.join(path_kicad_user_plugins, 'kicad-python'))
+    sys.path.insert(0, os.path.join(path_kicad_user_scripting, 'kicad-python'))
+    sys.path.insert(0, os.path.join(path_kicad_user_plugins, 'kicad-python'))
     try:
         import kicad
     except ImportError:
