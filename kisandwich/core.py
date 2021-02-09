@@ -60,8 +60,6 @@ module_map['LOW'] = {
 
 def process_tracks(pcb, which_one='LOW'):
     for tr in pcb.tracks:
-        if tr.layer.startswith('TOP'):
-            notify('Hit ' + tr.layer)
         tr_layer = layer_map[which_one].get(tr.layer, tr.layer)
         if tr_layer is None:
             pcb.remove(tr)
@@ -165,16 +163,19 @@ def sandwich_from_gui(which_one='LOW', refresh=False, outfile=None, proc_opts=No
             os.remove(tempfile)
 
 
-def base_to_default_boardfile(basefile, which_one='LOW', subdirectory=''):
+def base_to_default_boardfile(filepath, which_one='LOW', subdirectory=''):
+    ''' subdirectory is relative to the directory that the file is in '''
+    basefile = os.path.basename(filepath)
     components = basefile.split('.')
     newbase = components[-2] + '-sandwich_' + which_one + '.' + components[-1]
-    newdir = os.path.join(os.path.dirname(basefile), subdirectory)
+    newdir = os.path.join(os.path.dirname(filepath), subdirectory)
     if not os.path.exists(newdir):
         os.mkdir(newdir)
     return os.path.join(newdir, newbase)
 
 
 def sandwich_from_file(infile, which_one='LOW', outfile=None):
+    ''' The CLI '''
     if outfile is None:
         outfile = base_to_default_boardfile(infile, which_one)
     workingpcb = Board.load(infile)
