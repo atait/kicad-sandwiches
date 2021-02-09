@@ -19,10 +19,7 @@ class KisandwichGUI ( wx.Dialog ):
     def __init__( self, parent ):
         wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"Kisandwich", pos = wx.Point( 100,100 ), size = wx.Size( 465,500 ), style = wx.DEFAULT_DIALOG_STYLE|wx.BORDER_THEME|wx.TAB_TRAVERSAL )
 
-        try:
-            self.SetSizeHints( wx.DefaultSize, wx.DefaultSize )
-        except TypeError:
-            pass
+        self.SetSizeHints( wx.DefaultSize, wx.DefaultSize )
 
         bSizer1 = wx.BoxSizer( wx.VERTICAL )
 
@@ -94,11 +91,15 @@ class KisandwichGUI ( wx.Dialog ):
         self.m_optVias.SetValue(True)
         bSizer15.Add( self.m_optVias, 0, wx.SHAPED, 5 )
 
+        self.m_optZones = wx.CheckBox( sbSizer2.GetStaticBox(), wx.ID_ANY, u"Zones", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_optZones.SetValue(True)
+        bSizer15.Add( self.m_optZones, 0, wx.SHAPED, 5 )
+
+        self.m_optZonesRemoveKeepouts = wx.CheckBox( sbSizer2.GetStaticBox(), wx.ID_ANY, u"Remove\nkeepouts", wx.DefaultPosition, wx.DefaultSize, 0 )
+        bSizer15.Add( self.m_optZonesRemoveKeepouts, 0, wx.ALIGN_RIGHT|wx.RIGHT, 5 )
+
 
         sbSizer2.Add( bSizer15, 1, wx.EXPAND, 5 )
-
-
-        sbSizer2.Add( ( 0, 0), 1, wx.ALL|wx.EXPAND, 5 )
 
         gSizer1 = wx.GridSizer( 3, 3, 0, 0 )
 

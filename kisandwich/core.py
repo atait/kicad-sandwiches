@@ -18,6 +18,7 @@ layer_map = dict()
 layer_map['TOP'] = {
     'Eco1.User': 'Edge.Cuts',
     'TOP.Cuts': 'Edge.Cuts',
+    'Eco2.User': None,
 
     'In1.Cu': None,
     'In2.Cu': 'F.Cu',
@@ -34,6 +35,7 @@ layer_map['TOP'] = {
 layer_map['LOW'] = {
     'Eco2.User': 'Edge.Cuts',
     'LOW.Cuts': 'Edge.Cuts',
+    'Eco1.User': None,
 
     'In1.Cu': 'B.Cu',
     'In2.Cu': None,
@@ -65,6 +67,18 @@ def process_tracks(pcb, which_one='LOW'):
             pcb.remove(tr)
         else:
             tr.layer = tr_layer
+
+
+def process_zones(pcb, which_one='LOW', remove_keepouts=False):
+    ''' Bug: does not work with multi-layer keepouts '''
+    for zone in pcb.zones:
+        zo_layer = layer_map[which_one].get(zone.layer, zone.layer)
+        if zo_layer is None:
+            pcb.remove(zone)
+        else:
+            zone.layer = zo_layer
+        if remove_keepouts and zone.is_keepout:
+            pcb.remove(zone)
 
 
 def process_drawings(pcb, which_one='LOW'):
@@ -132,7 +146,7 @@ def process_vias(pcb, which_one='LOW',
                 opening_width)
 
 
-def process_all(pcb, which_one='LOW', proc_opts=None, bp_opts=None):
+def process_all(pcb, which_one='LOW', proc_opts=None, bp_opts=None, zone_opts=None):
     ''' proc_opts is a dictionary with either functions or strings describing the steps to take '''
     if proc_opts is None or proc_opts.get('tracks', False):
         process_tracks(pcb, which_one)
@@ -141,14 +155,21 @@ def process_all(pcb, which_one='LOW', proc_opts=None, bp_opts=None):
     if proc_opts is None or proc_opts.get('modules', False):
         process_modules(pcb, which_one)
     if proc_opts is None or proc_opts.get('vias', False):
+        if bp_opts is None:
+            bp_opts = dict()
         process_vias(pcb, which_one, **bp_opts)
+    if proc_opts is None or proc_opts.get('zones', False):
+        if zone_opts is None:
+            zone_opts = dict()
+        process_zones(pcb, which_one, **zone_opts)
+    pcb.fill_zones()
 
 
 ### Entry points
-def sandwich_from_gui(which_one='LOW', refresh=False, outfile=None, proc_opts=None, bp_opts=None):
+def sandwich_from_gui(which_one='LOW', refresh=False, outfile=None, proc_opts=None, bp_opts=None, zone_opts=None):
     livepcb = Board.from_editor()
     if refresh:
-        process_all(livepcb, which_one, proc_opts=proc_opts, bp_opts=bp_opts)
+        process_all(livepcb, which_one, proc_opts=proc_opts, bp_opts=bp_opts, zone_opts=zone_opts)
         pcbnew.Refresh()
         if outfile is not None:
             livepcb.save(outfile)
@@ -157,7 +178,7 @@ def sandwich_from_gui(which_one='LOW', refresh=False, outfile=None, proc_opts=No
         livepcb.save(tempfile)
         try:
             workingpcb = Board.load(tempfile)
-            process_all(workingpcb, which_one, proc_opts=proc_opts, bp_opts=bp_opts)
+            process_all(workingpcb, which_one, proc_opts=proc_opts, bp_opts=bp_opts, zone_opts=zone_opts)
             workingpcb.save(outfile)
         finally:
             os.remove(tempfile)

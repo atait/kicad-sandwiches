@@ -26,6 +26,15 @@ class KisandwichDialog(KisandwichGUI):
         self.m_filePicker_TOP.SetPath(base_to_default_boardfile(pcbpath, 'TOP', subdirectory='kisandwich-out'))
         self.m_filePicker_LOW.SetPath(base_to_default_boardfile(pcbpath, 'LOW', subdirectory='kisandwich-out'))
 
+    # hack for new wxFormBuilder generating code incompatible with old wxPython
+    def SetSizeHints(self, sz1, sz2):
+        try:
+            # wxPython 3
+            self.SetSizeHintsSz(sz1, sz2)
+        except TypeError:
+            # wxPython 4
+            super(KisandwichDialog, self).SetSizeHints(sz1, sz2)
+
     def on_radioboth( self, event ):
         if self.m_radioBtn_BOTH.GetValue():
             self.m_chkbox_saving.SetValue(True)
@@ -34,7 +43,9 @@ class KisandwichDialog(KisandwichGUI):
             self.m_chkbox_updating.Disable()
         else:
             self.m_chkbox_saving.Enable()
+            self.m_chkbox_saving.SetValue(False)
             self.m_chkbox_updating.Enable()
+            self.m_chkbox_updating.SetValue(True)
 
         event.Skip()
 
@@ -63,7 +74,8 @@ class KisandwichDialog(KisandwichGUI):
             tracks=bool(self.m_optTracks.GetValue()),
             drawings=bool(self.m_optDrawings.GetValue()),
             modules=bool(self.m_optModules.GetValue()),
-            vias=bool(self.m_optVias.GetValue())
+            vias=bool(self.m_optVias.GetValue()),
+            zones=bool(self.m_optZones.GetValue())
         )
 
         sel['bp_opts'] = dict(
@@ -77,6 +89,10 @@ class KisandwichDialog(KisandwichGUI):
         default_float(self.m_bpopt_padMinimum, 'diameter_minimum')
         default_float(self.m_bpopt_drillCoerce, 'drill_override')
         default_float(self.m_bpopt_drillMinimum, 'drill_minimum')
+
+        sel['zone_opts'] = dict(
+            remove_keepouts=bool(self.m_optZonesRemoveKeepouts.GetValue())
+        )
 
         return sel
 
@@ -119,7 +135,7 @@ class Kisandwich(pcbnew.ActionPlugin):
         else:
             files = dict(TOP=None, LOW=None)
 
-        script_kw = dict(refresh=sel['refreshing'], proc_opts=sel['proc_opts'], bp_opts=sel['bp_opts'])
+        script_kw = dict(refresh=sel['refreshing'], proc_opts=sel['proc_opts'], bp_opts=sel['bp_opts'], zone_opts=sel['zone_opts'])
         if sel['wich'] == 'TOP':
             sandwich_from_gui('TOP', outfile=files['TOP'], **script_kw)
         elif sel['wich'] == 'LOW':
