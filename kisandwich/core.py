@@ -49,30 +49,25 @@ layer_map['LOW'] = {
     'F.Paste': None,
     'F.Adhes': None,
 }
-
-module_map = dict()
-module_map['TOP'] = {
-    Layer.Front: None,
-}
-module_map['LOW'] = {
-    Layer.Back: None,
-}
+layer_map[('TOP', 'inside')] = layer_map['TOP']
+layer_map[('LOW', 'inside')] = layer_map['LOW']
+layer_map[('TOP', 'outside')] = layer_map['LOW']
+layer_map[('LOW', 'outside')] = layer_map['TOP']
 
 
-
-def process_tracks(pcb, which_one='LOW'):
+def process_tracks(pcb, which_one='LOW', sandwich_type='inside'):
     for tr in pcb.tracks:
-        tr_layer = layer_map[which_one].get(tr.layer, tr.layer)
+        tr_layer = layer_map[which_one, sandwich_type].get(tr.layer, tr.layer)
         if tr_layer is None:
             pcb.remove(tr)
         else:
             tr.layer = tr_layer
 
 
-def process_zones(pcb, which_one='LOW', remove_keepouts=False):
+def process_zones(pcb, which_one='LOW', sandwich_type='inside', remove_keepouts=False):
     ''' Bug: does not work with multi-layer keepouts '''
     for zone in pcb.zones:
-        zo_layer = layer_map[which_one].get(zone.layer, zone.layer)
+        zo_layer = layer_map[which_one, sandwich_type].get(zone.layer, zone.layer)
         if zo_layer is None:
             pcb.remove(zone)
         else:
@@ -81,10 +76,8 @@ def process_zones(pcb, which_one='LOW', remove_keepouts=False):
             pcb.remove(zone)
 
 
-def process_drawings(pcb, which_one='LOW'):
+def process_drawings(pcb, which_one='LOW', sandwich_type='inside'):
     for dw in pcb.drawings:
-        if dw.layer.startswith('TOP'):
-            notify('Hit ' + dw.layer)
         dw_layer = layer_map[which_one].get(dw.layer, dw.layer)
         if dw_layer is None:
             pcb.remove(dw)
@@ -92,17 +85,23 @@ def process_drawings(pcb, which_one='LOW'):
             dw.layer = dw_layer
 
 
-def process_modules(pcb, which_one='LOW'):
+def process_modules(pcb, which_one='LOW', sandwich_type='inside'):
+    if (sandwich_type == 'inside') ^ (which_one == 'TOP'):
+        module_map = {Layer.Back: None}
+    else:
+        module_map = {Layer.Front: None}
+
     for mod in pcb.modules:
-        mod_layer = module_map[which_one].get(mod.layer, mod.layer)
+        mod_layer = module_map.get(mod.layer, mod.layer)
         if mod_layer is None:
             pcb.remove(mod)
 
 
-def process_vias(pcb, which_one='LOW',
+def process_vias(pcb, which_one='LOW', sandwich_type='inside',
     coverage_ratio=1.1,
     diameter_override=None, diameter_minimum=None,
-    drill_override=None, drill_minimum=None
+    drill_override=None, drill_minimum=None,
+    module_treatment=None,
 ):
     ''' 1. Turn through vias into bonding pads. They really cannot be tented (i.e. with mask opening)
         2. Convert vias to internal layers into through vias. They can be tented.
@@ -114,14 +113,14 @@ def process_vias(pcb, which_one='LOW',
     for via in pcb.vias:
         # Turn blind vias into regular vias. Delete ones in wrong layers
         if via._obj.GetViaType() in [pcbnew.VIA_MICROVIA, pcbnew.VIA_BLIND_BURIED]:
-            toplayer = layer_map[which_one].get(via.top_layer, via.top_layer)
+            toplayer = layer_map[which_one, sandwich_type].get(via.top_layer, via.top_layer)
             if toplayer is None:
                 pcb.remove(via)
             else:
                 via.top_layer = toplayer
                 via._obj.SetViaType(pcbnew.VIA_THROUGH)
 
-            bottomlayer = layer_map[which_one].get(via.bottom_layer, via.bottom_layer)
+            bottomlayer = layer_map[which_one, sandwich_type].get(via.bottom_layer, via.bottom_layer)
             if bottomlayer is None:
                 pcb.remove(via)
             else:
@@ -142,34 +141,34 @@ def process_vias(pcb, which_one='LOW',
             pcb.add_circle(
                 via.center,
                 opening_radius,
-                'F.Mask' if which_one == 'LOW' else 'B.Mask',
+                'F.Mask' if (which_one == 'LOW') else 'B.Mask',
                 opening_width)
 
 
-def process_all(pcb, which_one='LOW', proc_opts=None, bp_opts=None, zone_opts=None):
+def process_all(pcb, which_one='LOW', proc_opts=None, bp_opts=None, zone_opts=None, sandwich_type=None):
     ''' proc_opts is a dictionary with either functions or strings describing the steps to take '''
     if proc_opts is None or proc_opts.get('tracks', False):
-        process_tracks(pcb, which_one)
+        process_tracks(pcb, which_one, sandwich_type=sandwich_type)
     if proc_opts is None or proc_opts.get('drawings', False):
-        process_drawings(pcb, which_one)
+        process_drawings(pcb, which_one, sandwich_type=sandwich_type)
     if proc_opts is None or proc_opts.get('modules', False):
-        process_modules(pcb, which_one)
+        process_modules(pcb, which_one, sandwich_type=sandwich_type)
     if proc_opts is None or proc_opts.get('vias', False):
         if bp_opts is None:
             bp_opts = dict()
-        process_vias(pcb, which_one, **bp_opts)
+        process_vias(pcb, which_one, sandwich_type=sandwich_type, **bp_opts)
     if proc_opts is None or proc_opts.get('zones', False):
         if zone_opts is None:
             zone_opts = dict()
-        process_zones(pcb, which_one, **zone_opts)
+        process_zones(pcb, which_one, sandwich_type=sandwich_type, **zone_opts)
     pcb.fill_zones()
 
 
 ### Entry points
-def sandwich_from_gui(which_one='LOW', refresh=False, outfile=None, proc_opts=None, bp_opts=None, zone_opts=None):
+def sandwich_from_gui(which_one='LOW', refresh=False, outfile=None, proc_opts=None, bp_opts=None, zone_opts=None, sandwich_type=None):
     livepcb = Board.from_editor()
     if refresh:
-        process_all(livepcb, which_one, proc_opts=proc_opts, bp_opts=bp_opts, zone_opts=zone_opts)
+        process_all(livepcb, which_one, proc_opts=proc_opts, bp_opts=bp_opts, zone_opts=zone_opts, sandwich_type=sandwich_type)
         pcbnew.Refresh()
         if outfile is not None:
             livepcb.save(outfile)
@@ -178,7 +177,7 @@ def sandwich_from_gui(which_one='LOW', refresh=False, outfile=None, proc_opts=No
         livepcb.save(tempfile)
         try:
             workingpcb = Board.load(tempfile)
-            process_all(workingpcb, which_one, proc_opts=proc_opts, bp_opts=bp_opts, zone_opts=zone_opts)
+            process_all(workingpcb, which_one, proc_opts=proc_opts, bp_opts=bp_opts, zone_opts=zone_opts, sandwich_type=sandwich_type)
             workingpcb.save(outfile)
         finally:
             os.remove(tempfile)

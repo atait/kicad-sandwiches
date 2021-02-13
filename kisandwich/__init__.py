@@ -1,3 +1,4 @@
+import traceback
 from atait_scripting_support import reload, notify, expose_kicad_python
 
 try:
@@ -12,7 +13,7 @@ try:
     from .core import *
 except Exception as e:
     try:
-        notify('Kisandwich import failed\n' + str(e))
+        notify('Kisandwich import failed\n' + traceback.format_exc())
     except Exception:
         pass
 

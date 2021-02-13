@@ -10,21 +10,26 @@ from . import gui_dialog
 from .gui_dialog import KisandwichGUI
 
 
+class objview(dict):
+    def __getattr__(self, attr):
+        return self.__getitem__(attr)
+
+    def __setattr__(self, attr, val):
+        self.__setitem__(attr, val)
+
+
 class KisandwichDialog(KisandwichGUI):
+    _previous_selections = None
+
     # hack for new wxFormBuilder generating code incompatible with old wxPython
     def __init__(self, parent):
         super(KisandwichDialog, self).__init__(parent)
-        self.livepcb = pcbnew.GetBoard()
-        pcbpath = self.livepcb.GetFileName()
         self.m_bitmap1.SetBitmap(wx.Bitmap(
             os.path.join(os.path.dirname(__file__), 'icons/sandwich-32.png'), wx.BITMAP_TYPE_ANY
         ))
-        # self.livefile = base_to_default_boardfile(pcbpath, 'temp')
-        # self.Bind(wx.EVT_CLOSE, self.OnQuit)
+        self.terminal_choiceOK.SetDefault()
 
-        self.m_sdbSizer1OK.SetDefault()
-        self.m_filePicker_TOP.SetPath(base_to_default_boardfile(pcbpath, 'TOP', subdirectory='kisandwich-out'))
-        self.m_filePicker_LOW.SetPath(base_to_default_boardfile(pcbpath, 'LOW', subdirectory='kisandwich-out'))
+        self.setup_GUI_selections(type(self)._previous_selections)
 
     # hack for new wxFormBuilder generating code incompatible with old wxPython
     def SetSizeHints(self, sz1, sz2):
@@ -56,21 +61,23 @@ class KisandwichDialog(KisandwichGUI):
         event.Skip()
 
     def get_user_selections(self):
-        sel = dict()
+        # Process files and which boards will be done
+        sel = objview()
         if self.m_radioBtn_TOP.GetValue():
             sel['wich'] = 'TOP'
         elif self.m_radioBtn_LOW.GetValue():
             sel['wich'] = 'LOW'
         elif self.m_radioBtn_BOTH.GetValue():
             sel['wich'] = 'BOTH'
-        sel['files'] = dict(
+        sel['files'] = objview(
             TOP=os.path.abspath(self.m_filePicker_TOP.GetPath()),
             LOW=os.path.abspath(self.m_filePicker_LOW.GetPath())
         )
         sel['saving'] = bool(self.m_chkbox_saving.GetValue())
-        sel['refreshing'] = bool(self.m_chkbox_updating.GetValue())
+        sel['refresh'] = bool(self.m_chkbox_updating.GetValue())
 
-        sel['proc_opts'] = dict(
+        # Process options
+        sel['proc_opts'] = objview(
             tracks=bool(self.m_optTracks.GetValue()),
             drawings=bool(self.m_optDrawings.GetValue()),
             modules=bool(self.m_optModules.GetValue()),
@@ -78,8 +85,9 @@ class KisandwichDialog(KisandwichGUI):
             zones=bool(self.m_optZones.GetValue())
         )
 
-        sel['bp_opts'] = dict(
+        sel['bp_opts'] = objview(
             coverage_ratio=float(self.m_bpopt_maskCoverage.GetValue()),
+            # surface=bool(self.m_bpOpt_surface.GetValue())
         )
         def default_float(textctrl, key):
             if textctrl.GetValue() not in ['uniform', 'minimum']:
@@ -90,11 +98,58 @@ class KisandwichDialog(KisandwichGUI):
         default_float(self.m_bpopt_drillCoerce, 'drill_override')
         default_float(self.m_bpopt_drillMinimum, 'drill_minimum')
 
-        sel['zone_opts'] = dict(
+        sel['zone_opts'] = objview(
             remove_keepouts=bool(self.m_optZonesRemoveKeepouts.GetValue())
         )
 
+        if self.m_modules_inside.GetValue():
+            sel['sandwich_type'] = 'inside'
+        if self.m_modules_outside.GetValue():
+            sel['sandwich_type'] = 'outside'
+        if self.m_modules_none.GetValue():
+            sel['sandwich_type'] = 'none'
+
+        type(self)._previous_selections = sel
+
         return sel
+
+    def setup_GUI_selections(self, sel=None):
+        if sel is None:
+            livepcb = pcbnew.GetBoard()
+            pcbpath = livepcb.GetFileName()
+            self.m_filePicker_TOP.SetPath(base_to_default_boardfile(pcbpath, 'TOP', subdirectory='kisandwich-out'))
+            self.m_filePicker_LOW.SetPath(base_to_default_boardfile(pcbpath, 'LOW', subdirectory='kisandwich-out'))
+            return
+        else:
+            self.m_filePicker_TOP.SetPath(sel.files.TOP)
+            self.m_filePicker_LOW.SetPath(sel.files.LOW)
+
+            self.m_radioBtn_TOP.SetValue(sel.wich == 'TOP')
+            self.m_radioBtn_LOW.SetValue(sel.wich == 'LOW')
+            self.m_radioBtn_BOTH.SetValue(sel.wich == 'BOTH')
+            self.m_chkbox_saving.SetValue(sel.saving)
+            self.m_chkbox_updating.SetValue(sel.refresh)
+
+            self.m_optTracks.SetValue(sel.proc_opts.tracks)
+            self.m_optDrawings.SetValue(sel.proc_opts.drawings)
+            self.m_optModules.SetValue(sel.proc_opts.modules)
+            self.m_optVias.SetValue(sel.proc_opts.vias)
+            self.m_optZones.SetValue(sel.proc_opts.zones)
+
+            def default_str(textctrl, key):
+                if key in sel.bp_opts:
+                    textctrl.SetValue('{:.3f}'.format(sel.bp_opts[key]))
+            default_str(self.m_bpopt_maskCoverage, 'coverage_ratio')
+            default_str(self.m_bpopt_padCoerce, 'diameter_override')
+            default_str(self.m_bpopt_padMinimum, 'diameter_minimum')
+            default_str(self.m_bpopt_drillCoerce, 'drill_override')
+            default_str(self.m_bpopt_drillMinimum, 'drill_minimum')
+
+            self.m_optZonesRemoveKeepouts.SetValue(sel.zone_opts.remove_keepouts)
+
+            self.m_modules_inside.SetValue(sel.sandwich_type == 'inside')
+            self.m_modules_outside.SetValue(sel.sandwich_type == 'outside')
+            self.m_modules_none.SetValue(sel.sandwich_type == 'none')
 
 
 class Kisandwich(pcbnew.ActionPlugin):
@@ -120,6 +175,7 @@ class Kisandwich(pcbnew.ActionPlugin):
         # show dialog
         main_dialog = KisandwichDialog(_pcbnew_frame)
         main_res = main_dialog.ShowModal()
+        sel = main_dialog.get_user_selections()
 
         if main_res == wx.ID_OK:
             # notify('OK')
@@ -129,13 +185,14 @@ class Kisandwich(pcbnew.ActionPlugin):
             return
 
         # sanitize values
-        sel = main_dialog.get_user_selections()
         if sel['saving']:
             files = sel['files']
         else:
             files = dict(TOP=None, LOW=None)
 
-        script_kw = dict(refresh=sel['refreshing'], proc_opts=sel['proc_opts'], bp_opts=sel['bp_opts'], zone_opts=sel['zone_opts'])
+        script_kw = dict(refresh=sel['refresh'], proc_opts=sel['proc_opts'],
+            bp_opts=sel['bp_opts'], zone_opts=sel['zone_opts'],
+            sandwich_type=sel['sandwich_type'])
         if sel['wich'] == 'TOP':
             sandwich_from_gui('TOP', outfile=files['TOP'], **script_kw)
         elif sel['wich'] == 'LOW':

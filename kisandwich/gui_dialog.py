@@ -17,7 +17,7 @@ import wx.xrc
 class KisandwichGUI ( wx.Dialog ):
 
     def __init__( self, parent ):
-        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"Kisandwich", pos = wx.Point( 100,100 ), size = wx.Size( 465,500 ), style = wx.DEFAULT_DIALOG_STYLE|wx.BORDER_THEME|wx.TAB_TRAVERSAL )
+        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"Kisandwich", pos = wx.Point( 100,100 ), size = wx.Size( 465,550 ), style = wx.DEFAULT_DIALOG_STYLE|wx.BORDER_THEME|wx.TAB_TRAVERSAL )
 
         self.SetSizeHints( wx.DefaultSize, wx.DefaultSize )
 
@@ -71,78 +71,128 @@ class KisandwichGUI ( wx.Dialog ):
 
         bSizer1.Add( sbSizer1, 1, wx.ALL|wx.EXPAND, 5 )
 
-        sbSizer2 = wx.StaticBoxSizer( wx.StaticBox( self, wx.ID_ANY, u"Processor Settings" ), wx.HORIZONTAL )
+        self.m_listbook1 = wx.Listbook( self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LB_DEFAULT|wx.BORDER_RAISED )
+        self.panel_modules = wx.Panel( self.m_listbook1, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.BORDER_RAISED|wx.TAB_TRAVERSAL )
+        bSizer8 = wx.BoxSizer( wx.VERTICAL )
 
-        bSizer15 = wx.BoxSizer( wx.VERTICAL )
-
-        self.m_optTracks = wx.CheckBox( sbSizer2.GetStaticBox(), wx.ID_ANY, u"Tracks", wx.DefaultPosition, wx.DefaultSize, 0 )
-        self.m_optTracks.SetValue(True)
-        bSizer15.Add( self.m_optTracks, 0, wx.SHAPED, 5 )
-
-        self.m_optDrawings = wx.CheckBox( sbSizer2.GetStaticBox(), wx.ID_ANY, u"Drawings", wx.DefaultPosition, wx.DefaultSize, 0 )
-        self.m_optDrawings.SetValue(True)
-        bSizer15.Add( self.m_optDrawings, 0, wx.SHAPED, 5 )
-
-        self.m_optModules = wx.CheckBox( sbSizer2.GetStaticBox(), wx.ID_ANY, u"Modules", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_optModules = wx.CheckBox( self.panel_modules, wx.ID_ANY, u"Modules", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_optModules.SetValue(True)
-        bSizer15.Add( self.m_optModules, 0, wx.SHAPED, 5 )
+        self.m_optModules.Enable( False )
 
-        self.m_optVias = wx.CheckBox( sbSizer2.GetStaticBox(), wx.ID_ANY, u"Vias", wx.DefaultPosition, wx.DefaultSize, 0 )
+        bSizer8.Add( self.m_optModules, 0, wx.SHAPED, 5 )
+
+        self.m_modules_inside = wx.RadioButton( self.panel_modules, wx.ID_ANY, u"Inside of sandwich\n(Front FP -> LOW board, Back FP -> TOP board)", wx.DefaultPosition, wx.DefaultSize, wx.RB_GROUP )
+        bSizer8.Add( self.m_modules_inside, 0, wx.ALL, 5 )
+
+        self.m_modules_outside = wx.RadioButton( self.panel_modules, wx.ID_ANY, u"Outside of sandwich\n(Front FP -> TOP board, Back FP -> LOW board)", wx.DefaultPosition, wx.DefaultSize, 0 )
+        bSizer8.Add( self.m_modules_outside, 0, wx.ALL, 5 )
+
+        self.m_modules_none = wx.RadioButton( self.panel_modules, wx.ID_ANY, u"No action", wx.DefaultPosition, wx.DefaultSize, 0 )
+        bSizer8.Add( self.m_modules_none, 0, wx.ALL, 5 )
+
+
+        self.panel_modules.SetSizer( bSizer8 )
+        self.panel_modules.Layout()
+        bSizer8.Fit( self.panel_modules )
+        self.m_listbook1.AddPage( self.panel_modules, u"Modules", True )
+        self.panel_tracks = wx.Panel( self.m_listbook1, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.BORDER_RAISED|wx.TAB_TRAVERSAL )
+        bSizer11 = wx.BoxSizer( wx.VERTICAL )
+
+        self.m_optTracks = wx.CheckBox( self.panel_tracks, wx.ID_ANY, u"Process tracks", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_optTracks.SetValue(True)
+        bSizer11.Add( self.m_optTracks, 0, wx.SHAPED, 5 )
+
+
+        self.panel_tracks.SetSizer( bSizer11 )
+        self.panel_tracks.Layout()
+        bSizer11.Fit( self.panel_tracks )
+        self.m_listbook1.AddPage( self.panel_tracks, u"Tracks", False )
+        self.panel_drawings = wx.Panel( self.m_listbook1, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.BORDER_RAISED|wx.TAB_TRAVERSAL )
+        bSizer101 = wx.BoxSizer( wx.VERTICAL )
+
+        self.m_optDrawings = wx.CheckBox( self.panel_drawings, wx.ID_ANY, u"Process drawings", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_optDrawings.SetValue(True)
+        bSizer101.Add( self.m_optDrawings, 0, wx.SHAPED, 5 )
+
+
+        self.panel_drawings.SetSizer( bSizer101 )
+        self.panel_drawings.Layout()
+        bSizer101.Fit( self.panel_drawings )
+        self.m_listbook1.AddPage( self.panel_drawings, u"Drawings", False )
+        self.panel_pads = wx.Panel( self.m_listbook1, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.BORDER_RAISED|wx.TAB_TRAVERSAL )
+        bSizer12 = wx.BoxSizer( wx.VERTICAL )
+
+        self.m_optVias = wx.CheckBox( self.panel_pads, wx.ID_ANY, u"Process THT vias to bond pads", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_optVias.SetValue(True)
-        bSizer15.Add( self.m_optVias, 0, wx.SHAPED, 5 )
+        bSizer12.Add( self.m_optVias, 0, wx.ALL, 5 )
 
-        self.m_optZones = wx.CheckBox( sbSizer2.GetStaticBox(), wx.ID_ANY, u"Zones", wx.DefaultPosition, wx.DefaultSize, 0 )
-        self.m_optZones.SetValue(True)
-        bSizer15.Add( self.m_optZones, 0, wx.SHAPED, 5 )
+        self.m_bpOpt_surface = wx.CheckBox( self.panel_pads, wx.ID_ANY, u"Surface bond pads", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_bpOpt_surface.Enable( False )
 
-        self.m_optZonesRemoveKeepouts = wx.CheckBox( sbSizer2.GetStaticBox(), wx.ID_ANY, u"Remove\nkeepouts", wx.DefaultPosition, wx.DefaultSize, 0 )
-        bSizer15.Add( self.m_optZonesRemoveKeepouts, 0, wx.ALIGN_RIGHT|wx.RIGHT, 5 )
-
-
-        sbSizer2.Add( bSizer15, 1, wx.EXPAND, 5 )
+        bSizer12.Add( self.m_bpOpt_surface, 0, wx.ALL, 5 )
 
         gSizer1 = wx.GridSizer( 3, 3, 0, 0 )
 
-        self.m_staticText4 = wx.StaticText( sbSizer2.GetStaticBox(), wx.ID_ANY, u"Bond pad solder\nmask coverage", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText4 = wx.StaticText( self.panel_pads, wx.ID_ANY, u"Bond pad solder\nmask coverage", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText4.Wrap( -1 )
 
         gSizer1.Add( self.m_staticText4, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT, 5 )
 
-        self.m_bpopt_maskCoverage = wx.TextCtrl( sbSizer2.GetStaticBox(), wx.ID_ANY, u"1.1", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_bpopt_maskCoverage = wx.TextCtrl( self.panel_pads, wx.ID_ANY, u"1.1", wx.DefaultPosition, wx.DefaultSize, 0 )
         gSizer1.Add( self.m_bpopt_maskCoverage, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
 
-        self.m_staticText10 = wx.StaticText( sbSizer2.GetStaticBox(), wx.ID_ANY, u"Minima", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText10 = wx.StaticText( self.panel_pads, wx.ID_ANY, u"Minima", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText10.Wrap( -1 )
 
         gSizer1.Add( self.m_staticText10, 0, wx.ALIGN_BOTTOM|wx.ALL, 5 )
 
-        self.m_staticText5 = wx.StaticText( sbSizer2.GetStaticBox(), wx.ID_ANY, u"BP diam. (mm)", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText5 = wx.StaticText( self.panel_pads, wx.ID_ANY, u"BP diam. (mm)", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText5.Wrap( -1 )
 
         gSizer1.Add( self.m_staticText5, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT, 5 )
 
-        self.m_bpopt_padCoerce = wx.TextCtrl( sbSizer2.GetStaticBox(), wx.ID_ANY, u"uniform", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_bpopt_padCoerce = wx.TextCtrl( self.panel_pads, wx.ID_ANY, u"uniform", wx.DefaultPosition, wx.DefaultSize, 0 )
         gSizer1.Add( self.m_bpopt_padCoerce, 0, wx.ALL, 5 )
 
-        self.m_bpopt_padMinimum = wx.TextCtrl( sbSizer2.GetStaticBox(), wx.ID_ANY, u"minimum", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_bpopt_padMinimum = wx.TextCtrl( self.panel_pads, wx.ID_ANY, u"minimum", wx.DefaultPosition, wx.DefaultSize, 0 )
         gSizer1.Add( self.m_bpopt_padMinimum, 0, wx.ALL, 5 )
 
-        self.m_staticText51 = wx.StaticText( sbSizer2.GetStaticBox(), wx.ID_ANY, u"BP drill (mm)", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText51 = wx.StaticText( self.panel_pads, wx.ID_ANY, u"BP drill (mm)", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText51.Wrap( -1 )
 
         gSizer1.Add( self.m_staticText51, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT, 5 )
 
-        self.m_bpopt_drillCoerce = wx.TextCtrl( sbSizer2.GetStaticBox(), wx.ID_ANY, u"uniform", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_bpopt_drillCoerce = wx.TextCtrl( self.panel_pads, wx.ID_ANY, u"uniform", wx.DefaultPosition, wx.DefaultSize, 0 )
         gSizer1.Add( self.m_bpopt_drillCoerce, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
 
-        self.m_bpopt_drillMinimum = wx.TextCtrl( sbSizer2.GetStaticBox(), wx.ID_ANY, u"minimum", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_bpopt_drillMinimum = wx.TextCtrl( self.panel_pads, wx.ID_ANY, u"minimum", wx.DefaultPosition, wx.DefaultSize, 0 )
         gSizer1.Add( self.m_bpopt_drillMinimum, 0, wx.ALL, 5 )
 
 
-        sbSizer2.Add( gSizer1, 1, 0, 5 )
+        bSizer12.Add( gSizer1, 1, wx.EXPAND, 5 )
 
 
-        bSizer1.Add( sbSizer2, 1, wx.ALL|wx.EXPAND, 5 )
+        self.panel_pads.SetSizer( bSizer12 )
+        self.panel_pads.Layout()
+        bSizer12.Fit( self.panel_pads )
+        self.m_listbook1.AddPage( self.panel_pads, u"Bond pads", False )
+        self.panel_zones = wx.Panel( self.m_listbook1, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.BORDER_RAISED|wx.TAB_TRAVERSAL )
+        bSizer9 = wx.BoxSizer( wx.VERTICAL )
+
+        self.m_optZones = wx.CheckBox( self.panel_zones, wx.ID_ANY, u"Process zones", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_optZones.SetValue(True)
+        bSizer9.Add( self.m_optZones, 0, wx.ALL|wx.SHAPED, 5 )
+
+        self.m_optZonesRemoveKeepouts = wx.CheckBox( self.panel_zones, wx.ID_ANY, u"Remove keepouts", wx.DefaultPosition, wx.DefaultSize, 0 )
+        bSizer9.Add( self.m_optZonesRemoveKeepouts, 0, wx.ALL, 5 )
+
+
+        self.panel_zones.SetSizer( bSizer9 )
+        self.panel_zones.Layout()
+        bSizer9.Fit( self.panel_zones )
+        self.m_listbook1.AddPage( self.panel_zones, u"Zones", False )
+
+        bSizer1.Add( self.m_listbook1, 1, wx.EXPAND |wx.ALL, 5 )
 
         bSizer10 = wx.BoxSizer( wx.HORIZONTAL )
 
@@ -156,14 +206,14 @@ class KisandwichGUI ( wx.Dialog ):
 
         bSizer1.Add( bSizer10, 1, wx.ALIGN_CENTER, 5 )
 
-        m_sdbSizer1 = wx.StdDialogButtonSizer()
-        self.m_sdbSizer1OK = wx.Button( self, wx.ID_OK )
-        m_sdbSizer1.AddButton( self.m_sdbSizer1OK )
-        self.m_sdbSizer1Cancel = wx.Button( self, wx.ID_CANCEL )
-        m_sdbSizer1.AddButton( self.m_sdbSizer1Cancel )
-        m_sdbSizer1.Realize();
+        terminal_choice = wx.StdDialogButtonSizer()
+        self.terminal_choiceOK = wx.Button( self, wx.ID_OK )
+        terminal_choice.AddButton( self.terminal_choiceOK )
+        self.terminal_choiceCancel = wx.Button( self, wx.ID_CANCEL )
+        terminal_choice.AddButton( self.terminal_choiceCancel )
+        terminal_choice.Realize();
 
-        bSizer1.Add( m_sdbSizer1, 1, wx.ALIGN_CENTER_HORIZONTAL, 5 )
+        bSizer1.Add( terminal_choice, 1, wx.ALIGN_CENTER_HORIZONTAL, 5 )
 
 
         self.SetSizer( bSizer1 )
@@ -179,8 +229,8 @@ class KisandwichGUI ( wx.Dialog ):
         self.m_radioBtn_BOTH.Bind( wx.EVT_RADIOBUTTON, self.on_radioboth )
         self.m_chkbox_updating.Bind( wx.EVT_CHECKBOX, self.on_updating )
         self.m_chkbox_saving.Bind( wx.EVT_CHECKBOX, self.on_saving )
-        self.m_sdbSizer1Cancel.Bind( wx.EVT_BUTTON, self.cancel )
-        self.m_sdbSizer1OK.Bind( wx.EVT_BUTTON, self.execute )
+        self.terminal_choiceCancel.Bind( wx.EVT_BUTTON, self.cancel )
+        self.terminal_choiceOK.Bind( wx.EVT_BUTTON, self.execute )
 
     def __del__( self ):
         pass
