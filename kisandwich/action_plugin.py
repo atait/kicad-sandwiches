@@ -5,17 +5,9 @@ import os, sys
 from atait_scripting_support import notify, reload
 
 from . import core
-from .core import sandwich_from_gui, process_all, base_to_default_boardfile
+from .core import sandwich_from_gui, process_all, base_to_default_boardfile, objview
 from . import gui_dialog
 from .gui_dialog import KisandwichGUI
-
-
-class objview(dict):
-    def __getattr__(self, attr):
-        return self.__getitem__(attr)
-
-    def __setattr__(self, attr, val):
-        self.__setitem__(attr, val)
 
 
 class KisandwichDialog(KisandwichGUI):
@@ -109,6 +101,11 @@ class KisandwichDialog(KisandwichGUI):
         if self.m_modules_none.GetValue():
             sel['sandwich_type'] = 'none'
 
+        if self.m_drawings_bondMasks.GetValue():
+            sel['bond_masks'] = True
+        elif self.m_drawings_bondMargin.GetValue():
+            sel['bond_masks'] = False
+
         type(self)._previous_selections = sel
 
         return sel
@@ -151,6 +148,9 @@ class KisandwichDialog(KisandwichGUI):
             self.m_modules_outside.SetValue(sel.sandwich_type == 'outside')
             self.m_modules_none.SetValue(sel.sandwich_type == 'none')
 
+            self.m_drawings_bondMasks.SetValue(sel.bond_masks is True)
+            self.m_drawings_bondMargin.SetValue(sel.bond_masks is False)
+
 
 class Kisandwich(pcbnew.ActionPlugin):
     def defaults(self):
@@ -192,7 +192,7 @@ class Kisandwich(pcbnew.ActionPlugin):
 
         script_kw = dict(refresh=sel['refresh'], proc_opts=sel['proc_opts'],
             bp_opts=sel['bp_opts'], zone_opts=sel['zone_opts'],
-            sandwich_type=sel['sandwich_type'])
+            sandwich_type=sel['sandwich_type'], all_opts=sel)
         if sel['wich'] == 'TOP':
             sandwich_from_gui('TOP', outfile=files['TOP'], **script_kw)
         elif sel['wich'] == 'LOW':

@@ -9,6 +9,7 @@
 
 import wx
 import wx.xrc
+import wx.grid
 
 ###########################################################################
 ## Class KisandwichGUI
@@ -102,6 +103,37 @@ class KisandwichGUI ( wx.Dialog ):
         self.m_optTracks.SetValue(True)
         bSizer11.Add( self.m_optTracks, 0, wx.SHAPED, 5 )
 
+        self.m_grid1 = wx.grid.Grid( self.panel_tracks, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, 0 )
+
+        # Grid
+        self.m_grid1.CreateGrid( 4, 2 )
+        self.m_grid1.EnableEditing( True )
+        self.m_grid1.EnableGridLines( True )
+        self.m_grid1.EnableDragGridSize( False )
+        self.m_grid1.SetMargins( 0, 0 )
+
+        # Columns
+        self.m_grid1.EnableDragColMove( False )
+        self.m_grid1.EnableDragColSize( False )
+        self.m_grid1.SetColLabelValue( 0, u"TOP" )
+        self.m_grid1.SetColLabelValue( 1, u"LOW" )
+        self.m_grid1.SetColLabelAlignment( wx.ALIGN_CENTER, wx.ALIGN_CENTER )
+
+        # Rows
+        self.m_grid1.EnableDragRowSize( False )
+        self.m_grid1.SetRowLabelValue( 0, u"F.Cu" )
+        self.m_grid1.SetRowLabelValue( 1, u"In1.Cu" )
+        self.m_grid1.SetRowLabelValue( 2, u"In2.Cu" )
+        self.m_grid1.SetRowLabelValue( 3, u"B.Cu" )
+        self.m_grid1.SetRowLabelAlignment( wx.ALIGN_CENTER, wx.ALIGN_CENTER )
+
+        # Label Appearance
+
+        # Cell Defaults
+        self.m_grid1.SetDefaultCellTextColour( wx.SystemSettings.GetColour( wx.SYS_COLOUR_WINDOWTEXT ) )
+        self.m_grid1.SetDefaultCellAlignment( wx.ALIGN_LEFT, wx.ALIGN_TOP )
+        bSizer11.Add( self.m_grid1, 0, wx.ALL, 5 )
+
 
         self.panel_tracks.SetSizer( bSizer11 )
         self.panel_tracks.Layout()
@@ -113,6 +145,12 @@ class KisandwichGUI ( wx.Dialog ):
         self.m_optDrawings = wx.CheckBox( self.panel_drawings, wx.ID_ANY, u"Process drawings", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_optDrawings.SetValue(True)
         bSizer101.Add( self.m_optDrawings, 0, wx.SHAPED, 5 )
+
+        self.m_drawings_bondMasks = wx.RadioButton( self.panel_drawings, wx.ID_ANY, u"Bond by flipping B.Mask and F.Mask", wx.DefaultPosition, wx.DefaultSize, wx.RB_GROUP )
+        bSizer101.Add( self.m_drawings_bondMasks, 0, wx.ALL, 5 )
+
+        self.m_drawings_bondMargin = wx.RadioButton( self.panel_drawings, wx.ID_ANY, u"Bond using Margin layer", wx.DefaultPosition, wx.DefaultSize, 0 )
+        bSizer101.Add( self.m_drawings_bondMargin, 0, wx.ALL, 5 )
 
 
         self.panel_drawings.SetSizer( bSizer101 )

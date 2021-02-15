@@ -14,50 +14,61 @@ from kicad.pcbnew.board import Board
 # reload(module)
 # reload(board)
 
-layer_map = dict()
-layer_map['TOP'] = {
-    'Eco1.User': 'Edge.Cuts',
-    'TOP.Cuts': 'Edge.Cuts',
-    'Eco2.User': None,
 
+class objview(dict):
+    def __getattr__(self, attr):
+        return self.__getitem__(attr)
+
+    def __setattr__(self, attr, val):
+        self.__setitem__(attr, val)
+
+
+map_edges = objview(
+    TOP={
+        'Eco1.User': 'Edge.Cuts',
+        'TOP.Cuts': 'Edge.Cuts',
+        'Eco2.User': None,
+    },
+    LOW={
+        'Eco2.User': 'Edge.Cuts',
+        'LOW.Cuts': 'Edge.Cuts',
+        'Eco1.User': None,
+    }
+)
+
+map_drawings = objview(
+    TOP={
+        'B.SilkS': None,
+        'B.Mask': None,
+        'Margin': 'B.Mask'
+    }
+    LOW={
+        'F.SilkS': None,
+        'F.Mask': None,
+        'Margin': 'F.Mask'
+    }
+)
+
+map_copper = dict()
+map_copper['TOP', 'inside'] = {
     'In1.Cu': None,
     'In2.Cu': 'F.Cu',
     # 'B.Cu': 'B.Cu',
     'F.Cu': None,
-
-    'F.SilkS': 'F.SilkS',
-    'B.SilkS': None,
-    'F.Mask': None,
-    'TOP.Mask': 'F.Mask',
-    'B.Paste': None,
-    'B.Adhes': None,
 }
-layer_map['LOW'] = {
-    'Eco2.User': 'Edge.Cuts',
-    'LOW.Cuts': 'Edge.Cuts',
-    'Eco1.User': None,
-
+map_copper['LOW', 'inside'] = {
     'In1.Cu': 'B.Cu',
     'In2.Cu': None,
     # 'F.Cu': 'F.Cu',
     'B.Cu': None,
-
-    # 'B.SilkS': 'B.SilkS'.
-    'F.SilkS': None,
-    'B.Mask': None,
-    'LOW.Mask': 'B.Mask',
-    'F.Paste': None,
-    'F.Adhes': None,
 }
-layer_map[('TOP', 'inside')] = layer_map['TOP']
-layer_map[('LOW', 'inside')] = layer_map['LOW']
-layer_map[('TOP', 'outside')] = layer_map['LOW']
-layer_map[('LOW', 'outside')] = layer_map['TOP']
+map_copper[('TOP', 'outside')] = map_copper['LOW', 'inside']
+map_copper[('LOW', 'outside')] = map_copper['TOP', 'inside']
 
 
 def process_tracks(pcb, which_one='LOW', sandwich_type='inside'):
     for tr in pcb.tracks:
-        tr_layer = layer_map[which_one, sandwich_type].get(tr.layer, tr.layer)
+        tr_layer = map_copper[which_one, sandwich_type].get(tr.layer, tr.layer)
         if tr_layer is None:
             pcb.remove(tr)
         else:
@@ -67,7 +78,7 @@ def process_tracks(pcb, which_one='LOW', sandwich_type='inside'):
 def process_zones(pcb, which_one='LOW', sandwich_type='inside', remove_keepouts=False):
     ''' Bug: does not work with multi-layer keepouts '''
     for zone in pcb.zones:
-        zo_layer = layer_map[which_one, sandwich_type].get(zone.layer, zone.layer)
+        zo_layer = map_copper[which_one, sandwich_type].get(zone.layer, zone.layer)
         if zo_layer is None:
             pcb.remove(zone)
         else:
@@ -76,9 +87,21 @@ def process_zones(pcb, which_one='LOW', sandwich_type='inside', remove_keepouts=
             pcb.remove(zone)
 
 
-def process_drawings(pcb, which_one='LOW', sandwich_type='inside'):
+def process_drawings(pcb, which_one='LOW', sandwich_type='inside', all_opts=None):
+    my_map = map_drawings[which_one]
+    if all_opts is not None and all_opts['bond_masks']:
+        if which_one == 'TOP':
+            my_map = dict(
+                'B.SilkS': None,
+                'F.Mask': None
+            )
+        else:
+            my_map = dict(
+                'F.SilkS': None,
+                'B.Mask': None
+            )
     for dw in pcb.drawings:
-        dw_layer = layer_map[which_one].get(dw.layer, dw.layer)
+        dw_layer = my_map.get(dw.layer, dw.layer)
         if dw_layer is None:
             pcb.remove(dw)
         else:
@@ -113,14 +136,14 @@ def process_vias(pcb, which_one='LOW', sandwich_type='inside',
     for via in pcb.vias:
         # Turn blind vias into regular vias. Delete ones in wrong layers
         if via._obj.GetViaType() in [pcbnew.VIA_MICROVIA, pcbnew.VIA_BLIND_BURIED]:
-            toplayer = layer_map[which_one, sandwich_type].get(via.top_layer, via.top_layer)
+            toplayer = map_copper[which_one, sandwich_type].get(via.top_layer, via.top_layer)
             if toplayer is None:
                 pcb.remove(via)
             else:
                 via.top_layer = toplayer
                 via._obj.SetViaType(pcbnew.VIA_THROUGH)
 
-            bottomlayer = layer_map[which_one, sandwich_type].get(via.bottom_layer, via.bottom_layer)
+            bottomlayer = map_copper[which_one, sandwich_type].get(via.bottom_layer, via.bottom_layer)
             if bottomlayer is None:
                 pcb.remove(via)
             else:
@@ -145,12 +168,13 @@ def process_vias(pcb, which_one='LOW', sandwich_type='inside',
                 opening_width)
 
 
-def process_all(pcb, which_one='LOW', proc_opts=None, bp_opts=None, zone_opts=None, sandwich_type=None):
+def process_all(pcb, which_one='LOW', proc_opts=None, bp_opts=None,
+    zone_opts=None, sandwich_type=None, all_opts=None):
     ''' proc_opts is a dictionary with either functions or strings describing the steps to take '''
     if proc_opts is None or proc_opts.get('tracks', False):
         process_tracks(pcb, which_one, sandwich_type=sandwich_type)
     if proc_opts is None or proc_opts.get('drawings', False):
-        process_drawings(pcb, which_one, sandwich_type=sandwich_type)
+        process_drawings(pcb, which_one, sandwich_type=sandwich_type, all_opts=all_opts)
     if proc_opts is None or proc_opts.get('modules', False):
         process_modules(pcb, which_one, sandwich_type=sandwich_type)
     if proc_opts is None or proc_opts.get('vias', False):
@@ -165,10 +189,11 @@ def process_all(pcb, which_one='LOW', proc_opts=None, bp_opts=None, zone_opts=No
 
 
 ### Entry points
-def sandwich_from_gui(which_one='LOW', refresh=False, outfile=None, proc_opts=None, bp_opts=None, zone_opts=None, sandwich_type=None):
+def sandwich_from_gui(which_one='LOW', refresh=False, outfile=None,
+    proc_opts=None, bp_opts=None, zone_opts=None, sandwich_type=None, all_opts=None):
     livepcb = Board.from_editor()
     if refresh:
-        process_all(livepcb, which_one, proc_opts=proc_opts, bp_opts=bp_opts, zone_opts=zone_opts, sandwich_type=sandwich_type)
+        process_all(livepcb, which_one, proc_opts=proc_opts, bp_opts=bp_opts, zone_opts=zone_opts, sandwich_type=sandwich_type, all_opts=all_opts)
         pcbnew.Refresh()
         if outfile is not None:
             livepcb.save(outfile)
@@ -177,7 +202,7 @@ def sandwich_from_gui(which_one='LOW', refresh=False, outfile=None, proc_opts=No
         livepcb.save(tempfile)
         try:
             workingpcb = Board.load(tempfile)
-            process_all(workingpcb, which_one, proc_opts=proc_opts, bp_opts=bp_opts, zone_opts=zone_opts, sandwich_type=sandwich_type)
+            process_all(workingpcb, which_one, proc_opts=proc_opts, bp_opts=bp_opts, zone_opts=zone_opts, sandwich_type=sandwich_type, all_opts=all_opts)
             workingpcb.save(outfile)
         finally:
             os.remove(tempfile)
