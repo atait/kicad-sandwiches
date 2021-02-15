@@ -69,7 +69,8 @@ class KisandwichDialog(KisandwichGUI):
         sel['refresh'] = bool(self.m_chkbox_updating.GetValue())
 
         # Process options
-        sel['proc_opts'] = objview(
+        sel['proc_opts'] = objview()
+        sel['proc_opts']['enable'] = objview(
             tracks=bool(self.m_optTracks.GetValue()),
             drawings=bool(self.m_optDrawings.GetValue()),
             modules=bool(self.m_optModules.GetValue()),
@@ -77,34 +78,35 @@ class KisandwichDialog(KisandwichGUI):
             zones=bool(self.m_optZones.GetValue())
         )
 
-        sel['bp_opts'] = objview(
+        sel.proc_opts.vias = objview(
             coverage_ratio=float(self.m_bpopt_maskCoverage.GetValue()),
             # surface=bool(self.m_bpOpt_surface.GetValue())
         )
         def default_float(textctrl, key):
             if textctrl.GetValue() not in ['uniform', 'minimum']:
-                sel['bp_opts'][key] = float(textctrl.GetValue())
+                sel.proc_opts.vias[key] = float(textctrl.GetValue())
         default_float(self.m_bpopt_maskCoverage, 'coverage_ratio')
         default_float(self.m_bpopt_padCoerce, 'diameter_override')
         default_float(self.m_bpopt_padMinimum, 'diameter_minimum')
         default_float(self.m_bpopt_drillCoerce, 'drill_override')
         default_float(self.m_bpopt_drillMinimum, 'drill_minimum')
 
-        sel['zone_opts'] = objview(
+        sel.proc_opts.zones = objview(
             remove_keepouts=bool(self.m_optZonesRemoveKeepouts.GetValue())
         )
 
         if self.m_modules_inside.GetValue():
-            sel['sandwich_type'] = 'inside'
+            sel.proc_opts.sandwich_type = 'inside'
         if self.m_modules_outside.GetValue():
-            sel['sandwich_type'] = 'outside'
+            sel.proc_opts.sandwich_type = 'outside'
         if self.m_modules_none.GetValue():
-            sel['sandwich_type'] = 'none'
+            sel.proc_opts.sandwich_type = 'none'
 
+        sel.proc_opts.drawings = objview()
         if self.m_drawings_bondMasks.GetValue():
-            sel['bond_masks'] = True
+            sel.proc_opts.drawings.bond_masks = True
         elif self.m_drawings_bondMargin.GetValue():
-            sel['bond_masks'] = False
+            sel.proc_opts.drawings.bond_masks = False
 
         type(self)._previous_selections = sel
 
@@ -127,29 +129,29 @@ class KisandwichDialog(KisandwichGUI):
             self.m_chkbox_saving.SetValue(sel.saving)
             self.m_chkbox_updating.SetValue(sel.refresh)
 
-            self.m_optTracks.SetValue(sel.proc_opts.tracks)
-            self.m_optDrawings.SetValue(sel.proc_opts.drawings)
-            self.m_optModules.SetValue(sel.proc_opts.modules)
-            self.m_optVias.SetValue(sel.proc_opts.vias)
-            self.m_optZones.SetValue(sel.proc_opts.zones)
+            self.m_modules_inside.SetValue(sel.proc_opts.sandwich_type == 'inside')
+            self.m_modules_outside.SetValue(sel.proc_opts.sandwich_type == 'outside')
+            self.m_modules_none.SetValue(sel.proc_opts.sandwich_type == 'none')
+
+            self.m_optTracks.SetValue(sel.proc_opts.enable.tracks)
+            self.m_optDrawings.SetValue(sel.proc_opts.enable.drawings)
+            self.m_optModules.SetValue(sel.proc_opts.enable.modules)
+            self.m_optVias.SetValue(sel.proc_opts.enable.vias)
+            self.m_optZones.SetValue(sel.proc_opts.enable.zones)
 
             def default_str(textctrl, key):
-                if key in sel.bp_opts:
-                    textctrl.SetValue('{:.3f}'.format(sel.bp_opts[key]))
+                if key in sel.proc_opts.vias:
+                    textctrl.SetValue('{:.3f}'.format(sel.proc_opts.vias[key]))
             default_str(self.m_bpopt_maskCoverage, 'coverage_ratio')
             default_str(self.m_bpopt_padCoerce, 'diameter_override')
             default_str(self.m_bpopt_padMinimum, 'diameter_minimum')
             default_str(self.m_bpopt_drillCoerce, 'drill_override')
             default_str(self.m_bpopt_drillMinimum, 'drill_minimum')
 
-            self.m_optZonesRemoveKeepouts.SetValue(sel.zone_opts.remove_keepouts)
+            self.m_optZonesRemoveKeepouts.SetValue(sel.proc_opts.zones.remove_keepouts)
 
-            self.m_modules_inside.SetValue(sel.sandwich_type == 'inside')
-            self.m_modules_outside.SetValue(sel.sandwich_type == 'outside')
-            self.m_modules_none.SetValue(sel.sandwich_type == 'none')
-
-            self.m_drawings_bondMasks.SetValue(sel.bond_masks is True)
-            self.m_drawings_bondMargin.SetValue(sel.bond_masks is False)
+            self.m_drawings_bondMasks.SetValue(sel.proc_opts.drawings.bond_masks is True)
+            self.m_drawings_bondMargin.SetValue(sel.proc_opts.drawings.bond_masks is False)
 
 
 class Kisandwich(pcbnew.ActionPlugin):
@@ -190,9 +192,7 @@ class Kisandwich(pcbnew.ActionPlugin):
         else:
             files = dict(TOP=None, LOW=None)
 
-        script_kw = dict(refresh=sel['refresh'], proc_opts=sel['proc_opts'],
-            bp_opts=sel['bp_opts'], zone_opts=sel['zone_opts'],
-            sandwich_type=sel['sandwich_type'], all_opts=sel)
+        script_kw = dict(refresh=sel['refresh'], proc_opts=sel['proc_opts'])
         if sel['wich'] == 'TOP':
             sandwich_from_gui('TOP', outfile=files['TOP'], **script_kw)
         elif sel['wich'] == 'LOW':
