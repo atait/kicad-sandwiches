@@ -105,7 +105,8 @@ def process_drawings(pcb, which_one='LOW', proc_opts=None):
             }
     for dw in pcb.drawings:
         dw_layer = my_map.get(dw.layer, dw.layer)
-        dw_layer = map_edges[which_one].get(dw_layer, dw_layer)
+        dw_layer = map_edges[which_one].get(dw_layer, dw_layer)  # Also do edge cuts. This might be a separate function
+        dw_layer = map_copper[which_one, proc_opts.sandwich_type].get(dw_layer, dw_layer)  # Also do drawings on copper layers
         if dw_layer is None:
             pcb.remove(dw)
         else:
