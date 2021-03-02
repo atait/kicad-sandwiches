@@ -80,7 +80,8 @@ class KisandwichDialog(KisandwichGUI):
 
         sel.proc_opts.vias = objview(
             coverage_ratio=float(self.m_bpopt_maskCoverage.GetValue()),
-            # surface=bool(self.m_bpOpt_surface.GetValue())
+            # surface=bool(self.m_bpOpt_surface.GetValue()),
+            shrink=bool(self.m_bpOpt_shrink.GetValue())
         )
         def default_float(textctrl, key):
             if textctrl.GetValue() not in ['uniform', 'minimum']:
@@ -147,6 +148,8 @@ class KisandwichDialog(KisandwichGUI):
             default_str(self.m_bpopt_padMinimum, 'diameter_minimum')
             default_str(self.m_bpopt_drillCoerce, 'drill_override')
             default_str(self.m_bpopt_drillMinimum, 'drill_minimum')
+            # self.m_bpOpt_surface.SetValue(sel.proc_opts.vias.surface)
+            self.m_bpOpt_shrink.SetValue(sel.proc_opts.vias.shrink)
 
             self.m_optZonesRemoveKeepouts.SetValue(sel.proc_opts.zones.remove_keepouts)
 

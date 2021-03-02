@@ -138,6 +138,7 @@ def process_vias(pcb, which_one='LOW', proc_opts=None):
     diameter_minimum = proc_opts.vias.get('diameter_minimum', None)
     drill_override = proc_opts.vias.get('drill_override', None)
     drill_minimum = proc_opts.vias.get('drill_minimum', None)
+    shrink_outside = proc_opts.vias.get('shrink', True)
     assert diameter_override is None or diameter_minimum is None
     assert drill_override is None or drill_minimum is None
 
@@ -175,6 +176,13 @@ def process_vias(pcb, which_one='LOW', proc_opts=None):
                 opening_radius,
                 'F.Mask' if (which_one == 'LOW') else 'B.Mask',
                 opening_width)
+            if shrink_outside:
+                via.diameter = via.drill * 1.05
+                pcb.add_circle(
+                    via.center,
+                    opening_radius,
+                    'F.Cu' if (which_one == 'LOW') else 'B.Cu',
+                    opening_width)
 
 
 def process_all(pcb, which_one='LOW', proc_opts=None):

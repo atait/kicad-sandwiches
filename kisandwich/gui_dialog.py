@@ -95,7 +95,7 @@ class KisandwichGUI ( wx.Dialog ):
         self.panel_modules.SetSizer( bSizer8 )
         self.panel_modules.Layout()
         bSizer8.Fit( self.panel_modules )
-        self.m_listbook1.AddPage( self.panel_modules, u"Modules", True )
+        self.m_listbook1.AddPage( self.panel_modules, u"Modules", False )
         self.panel_tracks = wx.Panel( self.m_listbook1, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.BORDER_RAISED|wx.TAB_TRAVERSAL )
         bSizer11 = wx.BoxSizer( wx.VERTICAL )
 
@@ -152,6 +152,9 @@ class KisandwichGUI ( wx.Dialog ):
         self.m_drawings_bondMargin = wx.RadioButton( self.panel_drawings, wx.ID_ANY, u"Bond using Margin layer", wx.DefaultPosition, wx.DefaultSize, 0 )
         bSizer101.Add( self.m_drawings_bondMargin, 0, wx.ALL, 5 )
 
+        self.m_drawings_bondPaste = wx.RadioButton( self.panel_drawings, wx.ID_ANY, u"Bond using F.Paste layer", wx.DefaultPosition, wx.DefaultSize, 0 )
+        bSizer101.Add( self.m_drawings_bondPaste, 0, wx.ALL, 5 )
+
 
         self.panel_drawings.SetSizer( bSizer101 )
         self.panel_drawings.Layout()
@@ -164,7 +167,11 @@ class KisandwichGUI ( wx.Dialog ):
         self.m_optVias.SetValue(True)
         bSizer12.Add( self.m_optVias, 0, wx.ALL, 5 )
 
-        self.m_bpOpt_surface = wx.CheckBox( self.panel_pads, wx.ID_ANY, u"Surface bond pads", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_bpOpt_shrink = wx.CheckBox( self.panel_pads, wx.ID_ANY, u"Remove opposite side plating", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_bpOpt_shrink.SetValue(True)
+        bSizer12.Add( self.m_bpOpt_shrink, 0, wx.ALL, 5 )
+
+        self.m_bpOpt_surface = wx.CheckBox( self.panel_pads, wx.ID_ANY, u"Delete drill (bad idea)", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_bpOpt_surface.Enable( False )
 
         bSizer12.Add( self.m_bpOpt_surface, 0, wx.ALL, 5 )
@@ -213,7 +220,7 @@ class KisandwichGUI ( wx.Dialog ):
         self.panel_pads.SetSizer( bSizer12 )
         self.panel_pads.Layout()
         bSizer12.Fit( self.panel_pads )
-        self.m_listbook1.AddPage( self.panel_pads, u"Bond pads", False )
+        self.m_listbook1.AddPage( self.panel_pads, u"Bond pads", True )
         self.panel_zones = wx.Panel( self.m_listbook1, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.BORDER_RAISED|wx.TAB_TRAVERSAL )
         bSizer9 = wx.BoxSizer( wx.VERTICAL )
 
