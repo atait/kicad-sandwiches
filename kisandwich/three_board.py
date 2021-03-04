@@ -38,24 +38,24 @@ import kisandwich.core as core
 # }
 
 # Method 2
-map_copper = dict()
-map_copper['TOP', 'inside'] = {
+map_copper3 = dict()
+map_copper3['TOP', 'inside'] = {
     'F.Cu': None,
     'In1.Cu': None,
     'In2.Cu': None,
-    'In4.Cu': None,
+    'In3.Cu': None,
     'In4.Cu': 'F.Cu',
     'B.Cu': 'B.Cu',
 }
-map_copper['MID', 'inside'] = {
+map_copper3['MID', 'inside'] = {
     'F.Cu': None,
     'In1.Cu': None,
-    'In2.Cu': 'F.Cu',
-    'In3.Cu': 'B.Cu',
+    'In2.Cu': 'B.Cu',
+    'In3.Cu': 'F.Cu',
     'In4.Cu': None,
     'B.Cu': None,
 }  # mid is the decorative/structural board
-map_copper['LOW', 'inside'] = {
+map_copper3['LOW', 'inside'] = {
     'F.Cu': 'F.Cu',
     'In1.Cu': 'B.Cu',
     'In2.Cu': None,
@@ -63,8 +63,16 @@ map_copper['LOW', 'inside'] = {
     'In4.Cu': None,
     'B.Cu': None,
 }
-map_copper[('TOP', 'outside')] = map_copper['LOW', 'inside']
-map_copper[('LOW', 'outside')] = map_copper['TOP', 'inside']
+map_copper3[('TOP', 'outside')] = map_copper3['LOW', 'inside']
+map_copper3[('LOW', 'outside')] = map_copper3['TOP', 'inside']
+map_copper3[('MID', 'outside')] = {  # except flip it
+    'F.Cu': None,
+    'In1.Cu': None,
+    'In2.Cu': 'F.Cu',
+    'In3.Cu': 'B.Cu',
+    'In4.Cu': None,
+    'B.Cu': None,
+}
 
 # Alternative naming to reduce code changes
 # map_copper = dict()
