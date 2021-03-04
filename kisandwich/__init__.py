@@ -17,3 +17,10 @@ except Exception as e:
     except Exception:
         pass
 
+
+class objview(dict):
+    def __getattr__(self, attr):
+        return self.__getitem__(attr)
+
+    def __setattr__(self, attr, val):
+        self.__setitem__(attr, val)

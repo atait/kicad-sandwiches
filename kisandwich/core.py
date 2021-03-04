@@ -8,6 +8,7 @@ import kicad
 from kicad.pcbnew import drawing, module, board, layer
 from kicad.pcbnew.layer import Layer
 from kicad.pcbnew.board import Board
+from kisandwich import objview
 # Reload any modules that this project depends on
 # reload(kicad)
 # reload(drawing)
@@ -15,24 +16,24 @@ from kicad.pcbnew.board import Board
 # reload(board)
 
 
-class objview(dict):
-    def __getattr__(self, attr):
-        return self.__getitem__(attr)
-
-    def __setattr__(self, attr, val):
-        self.__setitem__(attr, val)
-
-
 map_edges = objview(
     TOP={
         'Eco1.User': 'Edge.Cuts',
         'TOP.Cuts': 'Edge.Cuts',
         'Eco2.User': None,
+        'Margin': None,
     },
     LOW={
         'Eco2.User': 'Edge.Cuts',
         'LOW.Cuts': 'Edge.Cuts',
         'Eco1.User': None,
+        'Margin': None,
+    },
+    MID={
+        'Margin': 'Edge.Cuts',
+        'MID.Cuts': 'Edge.Cuts',
+        'Eco1.User': None,
+        'Eco2.User': None,
     }
 )
 
@@ -40,12 +41,12 @@ map_drawings = objview(
     TOP={
         'B.SilkS': None,
         'B.Mask': None,
-        'Margin': 'B.Mask'
+        'F.Paste': 'B.Mask'
     },
     LOW={
         'F.SilkS': None,
         'F.Mask': None,
-        'Margin': 'F.Mask'
+        'F.Paste': 'F.Mask'
     }
 )
 
@@ -98,10 +99,17 @@ def process_drawings(pcb, which_one='LOW', proc_opts=None):
                 'B.SilkS': None,
                 'F.Mask': None
             }
-        else:
+        elif which_one == 'LOW':
             my_map = {
                 'F.SilkS': None,
                 'B.Mask': None
+            }
+        elif which_one == 'MID':  # For now there is no way to control silk and mask of mid board
+            my_map = {
+                'F.SilkS': None,
+                'B.Mask': None,
+                'B.SilkS': None,
+                'F.Mask': None
             }
     for dw in pcb.drawings:
         dw_layer = my_map.get(dw.layer, dw.layer)

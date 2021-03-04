@@ -18,7 +18,7 @@ import wx.grid
 class KisandwichGUI ( wx.Dialog ):
 
     def __init__( self, parent ):
-        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"Kisandwich", pos = wx.Point( 100,100 ), size = wx.Size( 465,550 ), style = wx.DEFAULT_DIALOG_STYLE|wx.BORDER_THEME|wx.TAB_TRAVERSAL )
+        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"Kisandwich", pos = wx.Point( 100,100 ), size = wx.Size( 465,600 ), style = wx.DEFAULT_DIALOG_STYLE|wx.BORDER_THEME|wx.TAB_TRAVERSAL )
 
         self.SetSizeHints( wx.DefaultSize, wx.DefaultSize )
 
@@ -58,6 +58,21 @@ class KisandwichGUI ( wx.Dialog ):
 
 
         sbSizer1.Add( bSizer31, 1, wx.EXPAND, 5 )
+
+        bSizer312 = wx.BoxSizer( wx.HORIZONTAL )
+
+        self.m_radioBtn_MID = wx.RadioButton( sbSizer1.GetStaticBox(), wx.ID_ANY, u"Mid", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_radioBtn_MID.SetMinSize( wx.Size( 100,-1 ) )
+
+        bSizer312.Add( self.m_radioBtn_MID, 0, wx.EXPAND, 5 )
+
+        self.m_filePicker_MID = wx.FilePickerCtrl( sbSizer1.GetStaticBox(), wx.ID_ANY, u"/home/atait/Documents/git-research/github-various/wxFormBuilder/.gitignore", u"Select a file", u"*.kicad_pcb", wx.DefaultPosition, wx.DefaultSize, wx.FLP_SAVE|wx.FLP_SMALL|wx.FLP_USE_TEXTCTRL )
+        self.m_filePicker_MID.SetMinSize( wx.Size( 320,-1 ) )
+
+        bSizer312.Add( self.m_filePicker_MID, 0, wx.ALL, 5 )
+
+
+        sbSizer1.Add( bSizer312, 1, wx.EXPAND, 5 )
 
         bSizer311 = wx.BoxSizer( wx.HORIZONTAL )
 
@@ -150,6 +165,8 @@ class KisandwichGUI ( wx.Dialog ):
         bSizer101.Add( self.m_drawings_bondMasks, 0, wx.ALL, 5 )
 
         self.m_drawings_bondMargin = wx.RadioButton( self.panel_drawings, wx.ID_ANY, u"Bond using Margin layer", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_drawings_bondMargin.Enable( False )
+
         bSizer101.Add( self.m_drawings_bondMargin, 0, wx.ALL, 5 )
 
         self.m_drawings_bondPaste = wx.RadioButton( self.panel_drawings, wx.ID_ANY, u"Bond using F.Paste layer", wx.DefaultPosition, wx.DefaultSize, 0 )
@@ -159,7 +176,7 @@ class KisandwichGUI ( wx.Dialog ):
         self.panel_drawings.SetSizer( bSizer101 )
         self.panel_drawings.Layout()
         bSizer101.Fit( self.panel_drawings )
-        self.m_listbook1.AddPage( self.panel_drawings, u"Drawings", False )
+        self.m_listbook1.AddPage( self.panel_drawings, u"Drawings", True )
         self.panel_pads = wx.Panel( self.m_listbook1, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.BORDER_RAISED|wx.TAB_TRAVERSAL )
         bSizer12 = wx.BoxSizer( wx.VERTICAL )
 
@@ -220,7 +237,7 @@ class KisandwichGUI ( wx.Dialog ):
         self.panel_pads.SetSizer( bSizer12 )
         self.panel_pads.Layout()
         bSizer12.Fit( self.panel_pads )
-        self.m_listbook1.AddPage( self.panel_pads, u"Bond pads", True )
+        self.m_listbook1.AddPage( self.panel_pads, u"Bond pads", False )
         self.panel_zones = wx.Panel( self.m_listbook1, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.BORDER_RAISED|wx.TAB_TRAVERSAL )
         bSizer9 = wx.BoxSizer( wx.VERTICAL )
 
@@ -229,6 +246,7 @@ class KisandwichGUI ( wx.Dialog ):
         bSizer9.Add( self.m_optZones, 0, wx.ALL|wx.SHAPED, 5 )
 
         self.m_optZonesRemoveKeepouts = wx.CheckBox( self.panel_zones, wx.ID_ANY, u"Remove keepouts", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_optZonesRemoveKeepouts.SetValue(True)
         bSizer9.Add( self.m_optZonesRemoveKeepouts, 0, wx.ALL, 5 )
 
 
@@ -271,6 +289,7 @@ class KisandwichGUI ( wx.Dialog ):
         self.Bind( wx.EVT_CLOSE, self.execute )
         self.m_radioBtn_TOP.Bind( wx.EVT_RADIOBUTTON, self.on_radioboth )
         self.m_radioBtn_LOW.Bind( wx.EVT_RADIOBUTTON, self.on_radioboth )
+        self.m_radioBtn_MID.Bind( wx.EVT_RADIOBUTTON, self.on_radioboth )
         self.m_radioBtn_BOTH.Bind( wx.EVT_RADIOBUTTON, self.on_radioboth )
         self.m_chkbox_updating.Bind( wx.EVT_CHECKBOX, self.on_updating )
         self.m_chkbox_saving.Bind( wx.EVT_CHECKBOX, self.on_saving )
@@ -290,6 +309,7 @@ class KisandwichGUI ( wx.Dialog ):
 
     def on_radioboth( self, event ):
         event.Skip()
+
 
 
 

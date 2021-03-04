@@ -13,13 +13,17 @@ from .gui_dialog import KisandwichGUI
 class KisandwichDialog(KisandwichGUI):
     _previous_selections = None
 
-    # hack for new wxFormBuilder generating code incompatible with old wxPython
-    def __init__(self, parent):
+    def __init__(self, parent, pcbpath=None, n_boards=2):
         super(KisandwichDialog, self).__init__(parent)
         self.m_bitmap1.SetBitmap(wx.Bitmap(
             os.path.join(os.path.dirname(__file__), 'icons/sandwich-32.png'), wx.BITMAP_TYPE_ANY
         ))
         self.terminal_choiceOK.SetDefault()
+
+        if pcbpath is None:
+            pcbpath = os.path.expanduser('~')
+        self.pcbpath = pcbpath
+        self.n_boards = n_boards
 
         self.setup_GUI_selections(type(self)._previous_selections)
 
@@ -59,6 +63,8 @@ class KisandwichDialog(KisandwichGUI):
             sel['wich'] = 'TOP'
         elif self.m_radioBtn_LOW.GetValue():
             sel['wich'] = 'LOW'
+        elif self.m_radioBtn_MID.GetValue():
+            sel['wich'] = 'MID'
         elif self.m_radioBtn_BOTH.GetValue():
             sel['wich'] = 'BOTH'
         sel['files'] = objview(
@@ -106,7 +112,8 @@ class KisandwichDialog(KisandwichGUI):
         sel.proc_opts.drawings = objview()
         if self.m_drawings_bondMasks.GetValue():
             sel.proc_opts.drawings.bond_masks = True
-        elif self.m_drawings_bondMargin.GetValue():
+        # elif self.m_drawings_bondMargin.GetValue():
+        elif self.m_drawings_bondPaste.GetValue():
             sel.proc_opts.drawings.bond_masks = False
 
         type(self)._previous_selections = sel
@@ -114,18 +121,28 @@ class KisandwichDialog(KisandwichGUI):
         return sel
 
     def setup_GUI_selections(self, sel=None):
+        if self.n_boards == 3:
+            self.m_radioBtn_MID.Enable()
+            self.m_filePicker_MID.Enable()
+        elif self.n_boards == 2:
+            self.m_radioBtn_MID.Disable()
+            self.m_filePicker_MID.Disable()
+        else:
+            raise ValueError('Wrong number of boards: ' + str(self.n_boards))
+
         if sel is None:
-            livepcb = pcbnew.GetBoard()
-            pcbpath = livepcb.GetFileName()
-            self.m_filePicker_TOP.SetPath(base_to_default_boardfile(pcbpath, 'TOP', subdirectory='kisandwich-out'))
-            self.m_filePicker_LOW.SetPath(base_to_default_boardfile(pcbpath, 'LOW', subdirectory='kisandwich-out'))
+            self.m_filePicker_TOP.SetPath(base_to_default_boardfile(self.pcbpath, 'TOP', subdirectory='kisandwich-out'))
+            self.m_filePicker_LOW.SetPath(base_to_default_boardfile(self.pcbpath, 'LOW', subdirectory='kisandwich-out'))
+            self.m_filePicker_MID.SetPath(base_to_default_boardfile(self.pcbpath, 'MID', subdirectory='kisandwich-out'))
             return
         else:
             self.m_filePicker_TOP.SetPath(sel.files.TOP)
             self.m_filePicker_LOW.SetPath(sel.files.LOW)
+            self.m_filePicker_MID.SetPath(sel.files.MID)
 
             self.m_radioBtn_TOP.SetValue(sel.wich == 'TOP')
             self.m_radioBtn_LOW.SetValue(sel.wich == 'LOW')
+            self.m_radioBtn_MID.SetValue(sel.wich == 'MID')
             self.m_radioBtn_BOTH.SetValue(sel.wich == 'BOTH')
             self.m_chkbox_saving.SetValue(sel.saving)
             self.m_chkbox_updating.SetValue(sel.refresh)
@@ -172,13 +189,23 @@ class Kisandwich(pcbnew.ActionPlugin):
 
         # load board
         livepcb = pcbnew.GetBoard()
+        pcbpath = livepcb.GetFileName()
         # go to the project folder - so that log will be in proper place
-        os.chdir(os.path.dirname(os.path.abspath(livepcb.GetFileName())))
+        os.chdir(os.path.dirname(os.path.abspath(pcbpath)))
         # find pcbnew frame
         _pcbnew_frame = [x for x in wx.GetTopLevelWindows() if x.GetTitle().lower().startswith('pcbnew')][0]
 
+        # How many boards are in the layer set
+        n_boards = livepcb.GetCopperLayerCount() // 2
+        if n_boards == 1:
+            notify('Four copper layers are needed to make a sandwich. Add more layers in board settings.')
+            return
+        elif n_boards > 3:
+            notify('More than three sandwich boards not supported. Get rid of some copper layers.')
+            return
+
         # show dialog
-        main_dialog = KisandwichDialog(_pcbnew_frame)
+        main_dialog = KisandwichDialog(_pcbnew_frame, pcbpath, n_boards=n_boards)
         main_res = main_dialog.ShowModal()
         sel = main_dialog.get_user_selections()
 
@@ -193,14 +220,12 @@ class Kisandwich(pcbnew.ActionPlugin):
         if sel['saving']:
             files = sel['files']
         else:
-            files = dict(TOP=None, LOW=None)
+            files = dict(TOP=None, LOW=None, MID=None)
 
         script_kw = dict(refresh=sel['refresh'], proc_opts=sel['proc_opts'])
-        if sel['wich'] == 'TOP':
+        if sel['wich'] in ('TOP', 'BOTH'):
             sandwich_from_gui('TOP', outfile=files['TOP'], **script_kw)
-        elif sel['wich'] == 'LOW':
+        elif sel['wich'] in ('LOW'. 'BOTH'):
             sandwich_from_gui('LOW', outfile=files['LOW'], **script_kw)
-        elif sel['wich'] == 'BOTH':
-            assert not script_kw['refresh']
-            sandwich_from_gui('TOP', outfile=files['TOP'], **script_kw)
-            sandwich_from_gui('LOW', outfile=files['LOW'], **script_kw)
+        elif n_boards == 3 and sel['wich'] in ('MID', 'BOTH'):
+            sandwich_from_gui('MID', outfile=files['MID'], **script_kw)
