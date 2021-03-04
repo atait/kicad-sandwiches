@@ -1,6 +1,15 @@
 import traceback
 from atait_scripting_support import reload, notify, expose_kicad_python
 
+
+class objview(dict):
+    def __getattr__(self, attr):
+        return self.__getitem__(attr)
+
+    def __setattr__(self, attr, val):
+        self.__setitem__(attr, val)
+
+
 try:
     expose_kicad_python()
     from kisandwich import action_plugin, core, gui_dialog
@@ -18,9 +27,3 @@ except Exception as e:
         pass
 
 
-class objview(dict):
-    def __getattr__(self, attr):
-        return self.__getitem__(attr)
-
-    def __setattr__(self, attr, val):
-        self.__setitem__(attr, val)

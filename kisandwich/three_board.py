@@ -7,6 +7,7 @@ from kicad.pcbnew import drawing, module, board, layer
 from kicad.pcbnew.layer import Layer
 from kicad.pcbnew.board import Board
 from kisandwich import objview
+import kisandwich.core as core
 
 
 # Method 1. Method 2 is the same except mid and top are switched
@@ -93,7 +94,7 @@ map_copper[('LOW', 'outside')] = map_copper['TOP', 'inside']
 # }
 
 
-def process_vias(pcb, which_one='LOW', proc_opts=None):
+def process_vias3(pcb, which_one='LOW', proc_opts=None):
     ''' 1. Turn through vias into bonding pads. They really cannot be tented (i.e. with mask opening)
         2. Convert vias to internal layers into through vias. They can be tented.
         Argument units in mm and pertain only to bonding pads
@@ -189,3 +190,15 @@ def process_vias(pcb, which_one='LOW', proc_opts=None):
             else:
                 via.bottom_layer = bottomlayer
                 via._obj.SetViaType(pcbnew.VIA_THROUGH)
+
+
+def process_modules3(pcb, which_one='LOW', proc_opts=None):
+    '''Use KISANDWICH-MIDBOARD in the value to designate '''
+    for mod in pcb.modules:
+        if (which_one == 'MID') ^ mod.value.startswith('KISANDWICH-MIDBOARD'):
+            pcb.remove(mod)
+
+    # filter again if it is one of the outer boards
+    if which_one != 'MID':
+        return core.process_modules(pcb, which_one, proc_opts)
+

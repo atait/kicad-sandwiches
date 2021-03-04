@@ -41,12 +41,19 @@ map_drawings = objview(
     TOP={
         'B.SilkS': None,
         'B.Mask': None,
-        'F.Paste': 'B.Mask'
+        'F.Adhes': 'B.Mask'
     },
     LOW={
         'F.SilkS': None,
         'F.Mask': None,
-        'F.Paste': 'F.Mask'
+        'F.Adhes': 'F.Mask'
+    },
+    MID={
+        'F.SilkS': None,
+        'F.Mask': None,
+        'B.SilkS': None,
+        'B.Mask': None,
+        # 'F.Adhes': 'F.Mask'  # TODO
     }
 )
 
@@ -195,6 +202,8 @@ def process_vias(pcb, which_one='LOW', proc_opts=None):
 
 def process_all(pcb, which_one='LOW', proc_opts=None):
     ''' proc_opts is a dictionary with either functions or strings describing the steps to take '''
+    if proc_opts.n_boards == 3:
+        from kisandwich.three_board import process_modules3 as process_modules
     if proc_opts.enable.tracks:
         process_tracks(pcb, which_one, proc_opts=proc_opts)
     if proc_opts.enable.drawings:

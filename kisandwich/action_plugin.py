@@ -69,7 +69,8 @@ class KisandwichDialog(KisandwichGUI):
             sel['wich'] = 'BOTH'
         sel['files'] = objview(
             TOP=os.path.abspath(self.m_filePicker_TOP.GetPath()),
-            LOW=os.path.abspath(self.m_filePicker_LOW.GetPath())
+            LOW=os.path.abspath(self.m_filePicker_LOW.GetPath()),
+            MID=os.path.abspath(self.m_filePicker_MID.GetPath())
         )
         sel['saving'] = bool(self.m_chkbox_saving.GetValue())
         sel['refresh'] = bool(self.m_chkbox_updating.GetValue())
@@ -113,8 +114,10 @@ class KisandwichDialog(KisandwichGUI):
         if self.m_drawings_bondMasks.GetValue():
             sel.proc_opts.drawings.bond_masks = True
         # elif self.m_drawings_bondMargin.GetValue():
-        elif self.m_drawings_bondPaste.GetValue():
+        elif self.m_drawings_bondAdhes.GetValue():
             sel.proc_opts.drawings.bond_masks = False
+
+        sel.proc_opts.n_boards = self.n_boards
 
         type(self)._previous_selections = sel
 
@@ -225,7 +228,7 @@ class Kisandwich(pcbnew.ActionPlugin):
         script_kw = dict(refresh=sel['refresh'], proc_opts=sel['proc_opts'])
         if sel['wich'] in ('TOP', 'BOTH'):
             sandwich_from_gui('TOP', outfile=files['TOP'], **script_kw)
-        elif sel['wich'] in ('LOW'. 'BOTH'):
+        elif sel['wich'] in ('LOW', 'BOTH'):
             sandwich_from_gui('LOW', outfile=files['LOW'], **script_kw)
         elif n_boards == 3 and sel['wich'] in ('MID', 'BOTH'):
             sandwich_from_gui('MID', outfile=files['MID'], **script_kw)
