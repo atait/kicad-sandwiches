@@ -228,7 +228,7 @@ class Kisandwich(pcbnew.ActionPlugin):
         script_kw = dict(refresh=sel['refresh'], proc_opts=sel['proc_opts'])
         if sel['wich'] in ('TOP', 'BOTH'):
             sandwich_from_gui('TOP', outfile=files['TOP'], **script_kw)
-        elif sel['wich'] in ('LOW', 'BOTH'):
+        if sel['wich'] in ('LOW', 'BOTH'):
             sandwich_from_gui('LOW', outfile=files['LOW'], **script_kw)
-        elif n_boards == 3 and sel['wich'] in ('MID', 'BOTH'):
+        if n_boards == 3 and sel['wich'] in ('MID', 'BOTH'):
             sandwich_from_gui('MID', outfile=files['MID'], **script_kw)

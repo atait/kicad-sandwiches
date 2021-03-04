@@ -110,7 +110,7 @@ class KisandwichGUI ( wx.Dialog ):
         self.panel_modules.SetSizer( bSizer8 )
         self.panel_modules.Layout()
         bSizer8.Fit( self.panel_modules )
-        self.m_listbook1.AddPage( self.panel_modules, u"Modules", False )
+        self.m_listbook1.AddPage( self.panel_modules, u"Modules", True )
         self.panel_tracks = wx.Panel( self.m_listbook1, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.BORDER_RAISED|wx.TAB_TRAVERSAL )
         bSizer11 = wx.BoxSizer( wx.VERTICAL )
 
@@ -169,14 +169,14 @@ class KisandwichGUI ( wx.Dialog ):
 
         bSizer101.Add( self.m_drawings_bondMargin, 0, wx.ALL, 5 )
 
-        self.m_drawings_bondPaste = wx.RadioButton( self.panel_drawings, wx.ID_ANY, u"Bond using F.Paste layer", wx.DefaultPosition, wx.DefaultSize, 0 )
-        bSizer101.Add( self.m_drawings_bondPaste, 0, wx.ALL, 5 )
+        self.m_drawings_bondAdhes = wx.RadioButton( self.panel_drawings, wx.ID_ANY, u"Bond using F.Adhes layer", wx.DefaultPosition, wx.DefaultSize, 0 )
+        bSizer101.Add( self.m_drawings_bondAdhes, 0, wx.ALL, 5 )
 
 
         self.panel_drawings.SetSizer( bSizer101 )
         self.panel_drawings.Layout()
         bSizer101.Fit( self.panel_drawings )
-        self.m_listbook1.AddPage( self.panel_drawings, u"Drawings", True )
+        self.m_listbook1.AddPage( self.panel_drawings, u"Drawings", False )
         self.panel_pads = wx.Panel( self.m_listbook1, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.BORDER_RAISED|wx.TAB_TRAVERSAL )
         bSizer12 = wx.BoxSizer( wx.VERTICAL )
 
