@@ -14,17 +14,6 @@ Comment3 ""
 Comment4 ""
 $EndDescr
 $Comp
-L Timer:LM555xM U1
-U 1 1 601C8A32
-P 3650 4050
-F 0 "U1" H 3650 4631 50  0000 C CNN
-F 1 "LM555xM" H 3650 4540 50  0000 C CNN
-F 2 "Package_SO:SOIC-8_3.9x4.9mm_P1.27mm" H 4500 3650 50  0001 C CNN
-F 3 "http://www.ti.com/lit/ds/symlink/lm555.pdf" H 4500 3650 50  0001 C CNN
-	1    3650 4050
-	1    0    0    -1  
-$EndComp
-$Comp
 L Timer:LM555xM U2
 U 1 1 601C92C0
 P 5200 4050
@@ -49,4 +38,15 @@ Wire Wire Line
 	5200 4450 5200 4600
 Wire Wire Line
 	5200 4600 3000 4600
+$Comp
+L Timer:LM555xM U1
+U 1 1 601C8A32
+P 3650 4050
+F 0 "U1" H 3650 4631 50  0000 C CNN
+F 1 "LM555xM" H 3650 4540 50  0000 C CNN
+F 2 "Package_SO:SOIC-8_3.9x4.9mm_P1.27mm" H 4500 3650 50  0001 C CNN
+F 3 "http://www.ti.com/lit/ds/symlink/lm555.pdf" H 4500 3650 50  0001 C CNN
+	1    3650 4050
+	1    0    0    -1  
+$EndComp
 $EndSCHEMATC
