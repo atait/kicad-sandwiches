@@ -110,47 +110,60 @@ def process_vias3(pcb, which_one='LOW', proc_opts=None):
     '''
     sandwich_type = proc_opts.sandwich_type
     coverage_ratio = proc_opts.vias.coverage_ratio
-    # diameter_override = proc_opts.vias.get('diameter_override', None)
-    # diameter_minimum = proc_opts.vias.get('diameter_minimum', None)
-    # drill_override = proc_opts.vias.get('drill_override', None)
-    # drill_minimum = proc_opts.vias.get('drill_minimum', None)
+    diameter_override = proc_opts.vias.get('diameter_override', None)
+    diameter_minimum = proc_opts.vias.get('diameter_minimum', None)
+    drill_override = proc_opts.vias.get('drill_override', None)
+    drill_minimum = proc_opts.vias.get('drill_minimum', None)
     shrink_outside = proc_opts.vias.get('shrink', True)
-    # assert diameter_override is None or diameter_minimum is None
-    # assert drill_override is None or drill_minimum is None
+    assert diameter_override is None or diameter_minimum is None
+    assert drill_override is None or drill_minimum is None
 
     for via in pcb.vias:
         # Bond pad cases
         make_pad = False
         if via._obj.GetViaType() in [pcbnew.VIA_MICROVIA, pcbnew.VIA_BLIND_BURIED]:
-            if {via.top_layer, via.bottom_layer} == {'In1.Cu', 'In2.Cu'}:
-                # Bond pad through everything
+            to_midboard = (
+                via.top_layer in {'In2.Cu', 'In3.Cu'}
+                or via.bottom_layer in {'In2.Cu', 'In3.Cu'}
+            )
+            to_frontboard = (
+                via.top_layer in {'In1.Cu', 'F.Cu'}
+                or via.bottom_layer in {'In1.Cu', 'F.Cu'}
+            )
+            to_backboard = (
+                via.top_layer in {'In4.Cu', 'B.Cu'}
+                or via.bottom_layer in {'In4.Cu', 'B.Cu'}
+            )
+
+            # Simple pad to the decorative board
+            if to_midboard and (to_frontboard or to_backboard):
                 make_pad = True
-                if which_one == 'LOW':
-                    to_mask = ['F']
-                elif which_one == 'TOP':
-                    to_mask = ['B']
-                elif which_one == 'MID':
-                    to_mask = ['F', 'B']
-            elif {via.top_layer, via.bottom_layer} == {'In3.Cu', 'In4.Cu'}:
-                # Simple pad to the decorative board
-                make_pad = True
-                if which_one == 'LOW':
-                    pcb.remove(via)
-                    continue
-                elif which_one == 'TOP':
-                    to_mask = ['B']
-                elif which_one == 'MID':
-                    to_mask = ['F']
+                if to_frontboard ^ (sandwich_type == 'inside'):
+                    if which_one == 'MID':
+                        to_mask = ['F']
+                    elif which_one == 'TOP':
+                        to_mask = ['B']
+                    elif which_one == 'LOW':
+                        pcb.remove(via)
+                        continue
+                if to_backboard ^ (sandwich_type == 'inside'):
+                    if which_one == 'MID':
+                        to_mask = ['B']
+                    elif which_one == 'TOP':
+                        pcb.remove(via)
+                        continue
+                    elif which_one == 'LOW':
+                        to_mask = ['F']
+
         elif via._obj.GetViaType() == pcbnew.VIA_THROUGH:
-            # Simple pad between technical boards
+            # Bond pad through everything
             make_pad = True
             if which_one == 'LOW':
                 to_mask = ['F']
             elif which_one == 'TOP':
-                pcb.remove(via)
-                continue
-            elif which_one == 'MID':
                 to_mask = ['B']
+            elif which_one == 'MID':
+                to_mask = ['F', 'B']
 
         # Make the pads
         if make_pad:
@@ -162,6 +175,7 @@ def process_vias3(pcb, which_one='LOW', proc_opts=None):
                 via.drill = drill_override
             elif drill_minimum is not None:
                 via.drill = max(via.drill, drill_minimum)
+            via._obj.SetViaType(pcbnew.VIA_THROUGH)
 
             opening_radius = coverage_ratio * via.diameter / 4
             opening_width = 2 * opening_radius
@@ -185,14 +199,14 @@ def process_vias3(pcb, which_one='LOW', proc_opts=None):
 
         # Turn blind vias into regular vias. Delete ones in wrong layers
         if via._obj.GetViaType() in [pcbnew.VIA_MICROVIA, pcbnew.VIA_BLIND_BURIED]:
-            toplayer = map_copper[which_one, sandwich_type].get(via.top_layer, via.top_layer)
+            toplayer = map_copper3[which_one, sandwich_type].get(via.top_layer, via.top_layer)
             if toplayer is None:
                 pcb.remove(via)
             else:
                 via.top_layer = toplayer
                 via._obj.SetViaType(pcbnew.VIA_THROUGH)
 
-            bottomlayer = map_copper[which_one, sandwich_type].get(via.bottom_layer, via.bottom_layer)
+            bottomlayer = map_copper3[which_one, sandwich_type].get(via.bottom_layer, via.bottom_layer)
             if bottomlayer is None:
                 pcb.remove(via)
             else:

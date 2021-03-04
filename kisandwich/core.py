@@ -204,7 +204,7 @@ def process_all(pcb, which_one='LOW', proc_opts=None):
     ''' proc_opts is a dictionary with either functions or strings describing the steps to take '''
     global map_copper
     if proc_opts.n_boards == 3:
-        from kisandwich.three_board import process_modules3 as process_modules, map_copper3
+        from kisandwich.three_board import process_modules3 as process_modules, map_copper3, process_vias3 as process_vias
         map_copper = map_copper3
     if proc_opts.enable.tracks:
         process_tracks(pcb, which_one, proc_opts=proc_opts)
