@@ -159,14 +159,16 @@ def process_vias3(pcb, which_one='LOW', proc_opts=None):
                 via._obj.SetViaType(pcbnew.VIA_THROUGH)
 
 
-def transmute_module_cuts(mod, which_one='LOW', flipped=False):
+def transmute_module_cuts(mod, which_one='LOW', flipped=False, proc_opts=None):
     ''' Change Eco1, Eco2, and Margin to Edge.Cuts or delete, depending on which board
     '''
+    which_one_eco = which_one
     if flipped:
-        which_one = {'LOW': 'TOP', 'TOP': 'LOW', 'MID': 'MID'}[which_one]
-    the_map = core.map_edges[which_one]
+        which_one_eco = {'LOW': 'TOP', 'TOP': 'LOW', 'MID': 'MID'}[which_one]
+    the_map = core.map_edges[which_one_eco]
     for dw in mod.graphicalItems:
         dw_layer = the_map.get(dw.layer, dw.layer)
+        dw_layer = map_copper3[which_one, proc_opts.sandwich_type].get(dw_layer, dw_layer)
         if dw_layer is None:
             mod.remove(dw)
         else:
@@ -181,7 +183,7 @@ def process_modules3(pcb, which_one='LOW', proc_opts=None):
         # cutter modules
         if mod.value.startswith('KISANDWICH-CUTTER'):
             flipped = (mod.layer == Layer.Back)
-            transmute_module_cuts(mod, which_one, flipped)
+            transmute_module_cuts(mod, which_one, flipped, proc_opts=proc_opts)
             continue  # never delete this module
         # midboard modules that can be on either layer
         elif mod.value.startswith('KISANDWICH-MIDBOARD'):

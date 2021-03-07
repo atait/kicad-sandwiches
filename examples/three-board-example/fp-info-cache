@@ -1,4 +1,4 @@
-18858985162898038
+18860600309881560
 Alex_Connectors
 3M_2908_MICROSD
 Courtesy: Adafruit Industries
@@ -13,13 +13,6 @@ Banana_Jack_Black
 0
 1
 1
-Alex_Connectors
-CUI-speaker-3layer-tight
-STD_v2_allSketches StepUp generated footprint
-
-0
-0
-0
 Alex_Connectors
 JLC_tooling_hole
 Mounting Hole 2.1mm, no annular
@@ -286,6 +279,20 @@ RGB LED 5050-6
 0
 6
 6
+Alex_Sandwiches
+CUI-speaker-3layer-tight
+STD_v2_allSketches StepUp generated footprint
+
+0
+0
+0
+Alex_Sandwiches
+light-hole
+Converted using: svg2mod -i light-hole-drawing.svg -p .2 -o light-hole.kicad_mod
+svg2mod
+0
+0
+0
 Alex_Sensors
 CapSense-FDC1004
 
