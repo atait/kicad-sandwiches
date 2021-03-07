@@ -60,4 +60,26 @@ F 3 "~" H 5580 1700 50  0001 C CNN
 	1    5550 1900
 	1    0    0    -1  
 $EndComp
+$Comp
+L Device:Speaker LS101
+U 1 1 6044355E
+P 4000 4850
+F 0 "LS101" H 4170 4846 50  0000 L CNN
+F 1 "Speaker" H 4170 4755 50  0000 L CNN
+F 2 "Alex_Connectors:Speaker_CUI_CLS0281MAE_embedded" H 4000 4650 50  0001 C CNN
+F 3 "~" H 3990 4800 50  0001 C CNN
+	1    4000 4850
+	1    0    0    -1  
+$EndComp
+$Comp
+L sandwich-features:Speaker-cutout-3board KS101
+U 1 1 60443B6A
+P 4000 4900
+F 0 "KS101" H 4000 4900 50  0001 C CNN
+F 1 "KISANDWICH-CUTTER" H 4378 4900 50  0000 L CNN
+F 2 "Alex_Connectors:CUI-speaker-3layer-tight" H 4000 4900 50  0001 C CNN
+F 3 "" H 4000 4900 50  0001 C CNN
+	1    4000 4900
+	1    0    0    -1  
+$EndComp
 $EndSCHEMATC

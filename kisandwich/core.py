@@ -19,19 +19,16 @@ from kisandwich import objview
 map_edges = objview(
     TOP={
         'Eco1.User': 'Edge.Cuts',
-        'TOP.Cuts': 'Edge.Cuts',
         'Eco2.User': None,
         'Margin': None,
     },
     LOW={
         'Eco2.User': 'Edge.Cuts',
-        'LOW.Cuts': 'Edge.Cuts',
         'Eco1.User': None,
         'Margin': None,
     },
     MID={
         'Margin': 'Edge.Cuts',
-        'MID.Cuts': 'Edge.Cuts',
         'Eco1.User': None,
         'Eco2.User': None,
     }
@@ -128,20 +125,17 @@ def process_drawings(pcb, which_one='LOW', proc_opts=None):
             dw.layer = dw_layer
 
 
-def process_modules(pcb, which_one='LOW', proc_opts=None):
-    sandwich_type = proc_opts.sandwich_type
-    if (sandwich_type == 'inside') ^ (which_one == 'TOP'):
-        module_map = {Layer.Back: None}
-    else:
-        module_map = {Layer.Front: None}
-
+def process_modules2(pcb, which_one='LOW', proc_opts=None):
     for mod in pcb.modules:
-        mod_layer = module_map.get(mod.layer, mod.layer)
-        if mod_layer is None:
+        if (
+            (which_one == 'LOW')
+            ^ (proc_opts.sandwich_type == 'inside')
+            ^ (mod.layer == Layer.Back)
+        ):
             pcb.remove(mod)
 
 
-def process_vias(pcb, which_one='LOW', proc_opts=None):
+def process_vias2(pcb, which_one='LOW', proc_opts=None):
     ''' 1. Turn through vias into bonding pads. They really cannot be tented (i.e. with mask opening)
         2. Convert vias to internal layers into through vias. They can be tented.
         Argument units in mm and pertain only to bonding pads
@@ -200,12 +194,18 @@ def process_vias(pcb, which_one='LOW', proc_opts=None):
                     opening_width)
 
 
+from kisandwich.three_board import process_modules3, map_copper3, process_vias3
+
 def process_all(pcb, which_one='LOW', proc_opts=None):
     ''' proc_opts is a dictionary with either functions or strings describing the steps to take '''
     global map_copper
     if proc_opts.n_boards == 3:
-        from kisandwich.three_board import process_modules3 as process_modules, map_copper3, process_vias3 as process_vias
+        process_modules = process_modules3
+        process_vias = process_vias3
         map_copper = map_copper3
+    else:
+        process_modules = process_modules2
+        process_vias = process_vias2
     if proc_opts.enable.tracks:
         process_tracks(pcb, which_one, proc_opts=proc_opts)
     if proc_opts.enable.drawings:

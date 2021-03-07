@@ -1,4 +1,4 @@
-18852279479398698
+18858985162898038
 Alex_Connectors
 3M_2908_MICROSD
 Courtesy: Adafruit Industries
@@ -13,6 +13,20 @@ Banana_Jack_Black
 0
 1
 1
+Alex_Connectors
+CUI-speaker-3layer-tight
+STD_v2_allSketches StepUp generated footprint
+
+0
+0
+0
+Alex_Connectors
+JLC_tooling_hole
+Mounting Hole 2.1mm, no annular
+mounting hole 2.1mm no annular
+0
+0
+0
 Alex_Connectors
 Nidec_slideSwitch_CLSB12C11
 
@@ -139,6 +153,13 @@ svg2mod
 0
 0
 0
+Alex_Graphics
+warning-magnetic
+Imported from magnetic.svg
+svg2mod
+0
+0
+0
 Alex_ICs
 Adafruit_PAM8302_SURFACE
 
@@ -168,23 +189,9 @@ Adafruit_VS1053B_THT
 36
 32
 Alex_ICs
-LED-SMD_6P-L3.5-W3.5-TL
-TCWIN GRB LED package with Chinese pin numbering convention. Notch is on pin 4
-RGB LED PLCC-6
-0
-6
-6
-Alex_ICs
 LED_QBLP679E-RGB
 
 
-0
-6
-6
-Alex_ICs
-LED_SMD_6P-L5.0-W5.0-TL_TC5050RGBF08
-Chinese TCWIN standard pinout with reversed polarity. For part C784540
-RGB LED 5050-6
 0
 6
 6
@@ -204,6 +211,13 @@ Through hole socket strip THT 1x15 2.54mm single row
 30
 Alex_ICs
 NANO_33_CastellOnly-flipEmbed
+Through hole straight socket strip, 1x15, 2.54mm pitch
+Through hole socket strip THT 1x15 2.54mm single row
+0
+30
+30
+Alex_ICs
+NANO_33_CastellOnly-flipEmbed-noPaste
 Through hole straight socket strip, 1x15, 2.54mm pitch
 Through hole socket strip THT 1x15 2.54mm single row
 0
@@ -244,6 +258,34 @@ WQFN-16-4x4-DRV8833RTY
 0
 21
 18
+Alex_LEDs
+ASMD-CWG7-NX7_upright
+Broadcomm ASMD. Wide area and diffuse white LED pointing upwards
+
+0
+2
+2
+Alex_LEDs
+ASMD-CWG7-NX7_upsidedown
+Broadcomm ASMD. Wide area and diffuse white LED pointing down INTO board. Includes mask opening but not copper keepout
+
+0
+3
+2
+Alex_LEDs
+LED-SMD_6P-L3.5-W3.5-TL
+TCWIN GRB LED package with Chinese pin numbering convention. Notch is on pin 4
+RGB LED PLCC-6
+0
+6
+6
+Alex_LEDs
+LED_SMD_6P-L5.0-W5.0-TL_TC5050RGBF08
+Chinese TCWIN standard pinout with reversed polarity. For part C784540
+RGB LED 5050-6
+0
+6
+6
 Alex_Sensors
 CapSense-FDC1004
 
@@ -251,20 +293,6 @@ CapSense-FDC1004
 0
 4
 4
-Arduino_Nano_v3
-NANO_33_Footprint_SMD_Castell
-Through hole straight socket strip, 1x15, 2.54mm pitch
-Through hole socket strip THT 1x15 2.54mm single row
-0
-30
-30
-Arduino_Nano_v3
-NANO_33_Socket_Castell
-Through hole straight socket strip, 1x15, 2.54mm pitch
-Through hole socket strip THT 1x15 2.54mm single row
-0
-90
-30
 Battery
 BatteryHolder_Bulgin_BX0036_1xC
 Bulgin Battery Holder, BX0036, Battery Type C (https://www.bulgin.com/products/pub/media/bulgin/data/Battery_holders.pdf)

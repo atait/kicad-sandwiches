@@ -10,33 +10,6 @@ from kisandwich import objview
 import kisandwich.core as core
 
 
-# Method 1. Method 2 is the same except mid and top are switched
-# map_copper = dict()
-# map_copper['TOP', 'inside'] = {
-#     'F.Cu': None,
-#     'In1.Cu': None,
-#     'In2.Cu': 'F.Cu',
-#     'In3.Cu': 'B.Cu',
-#     'In4.Cu': None,
-#     'B.Cu': None,
-# }  # top is the decorative board
-# map_copper['MID', 'inside'] = {
-#     'F.Cu': None,
-#     'In1.Cu': None,
-#     'In2.Cu': None,
-#     'In4.Cu': None,
-#     'In4.Cu': 'F.Cu',
-#     'B.Cu': 'B.Cu',
-# }
-# map_copper['LOW', 'inside'] = {
-#     'F.Cu': 'F.Cu',
-#     'In1.Cu': 'B.Cu',
-#     'In2.Cu': None,
-#     'In3.Cu': None,
-#     'In4.Cu': None,
-#     'B.Cu': None,
-# }
-
 # Method 2
 map_copper3 = dict()
 map_copper3['TOP', 'inside'] = {
@@ -74,39 +47,11 @@ map_copper3[('MID', 'outside')] = {  # except flip it
     'B.Cu': None,
 }
 
-# Alternative naming to reduce code changes
-# map_copper = dict()
-# map_copper['EXTRA', 'inside'] = {
-#     'F.Cu': None,
-#     'In1.Cu': None,
-#     'In2.Cu': 'F.Cu',
-#     'In3.Cu': 'B.Cu',
-#     'In4.Cu': None,
-#     'B.Cu': None,
-# }  # top is the decorative board
-# map_copper['TOP', 'inside'] = {
-#     'F.Cu': None,
-#     'In1.Cu': None,
-#     'In2.Cu': None,
-#     'In4.Cu': None,
-#     'In4.Cu': 'F.Cu',
-#     'B.Cu': 'B.Cu',
-# }
-# map_copper['LOW', 'inside'] = {
-#     'F.Cu': 'F.Cu',
-#     'In1.Cu': 'B.Cu',
-#     'In2.Cu': None,
-#     'In3.Cu': None,
-#     'In4.Cu': None,
-#     'B.Cu': None,
-# }
-
 
 def process_vias3(pcb, which_one='LOW', proc_opts=None):
     ''' 1. Turn through vias into bonding pads. They really cannot be tented (i.e. with mask opening)
         2. Convert vias to internal layers into through vias. They can be tented.
         Argument units in mm and pertain only to bonding pads
-        TODO: replace the bonding pads with a one-sided SMD pad so that routing can happen on the other side... This would be very confusing for DRC
     '''
     sandwich_type = proc_opts.sandwich_type
     coverage_ratio = proc_opts.vias.coverage_ratio
@@ -214,13 +159,43 @@ def process_vias3(pcb, which_one='LOW', proc_opts=None):
                 via._obj.SetViaType(pcbnew.VIA_THROUGH)
 
 
+def transmute_module_cuts(mod, which_one='LOW', flipped=False):
+    ''' Change Eco1, Eco2, and Margin to Edge.Cuts or delete, depending on which board
+    '''
+    if flipped:
+        which_one = {'LOW': 'TOP', 'TOP': 'LOW', 'MID': 'MID'}[which_one]
+    the_map = core.map_edges[which_one]
+    for dw in mod.graphicalItems:
+        dw_layer = the_map.get(dw.layer, dw.layer)
+        if dw_layer is None:
+            mod.remove(dw)
+        else:
+            dw.layer = dw_layer
+
+
 def process_modules3(pcb, which_one='LOW', proc_opts=None):
-    '''Use KISANDWICH-MIDBOARD in the value to designate '''
+    '''Use KISANDWICH-MIDBOARD in the value to designate footprint on the middle board
+        Use KISANDWICH-CUTTER to designate that drawings should be turned into cuts
+    '''
     for mod in pcb.modules:
-        if (which_one == 'MID') ^ mod.value.startswith('KISANDWICH-MIDBOARD'):
+        # cutter modules
+        if mod.value.startswith('KISANDWICH-CUTTER'):
+            flipped = (mod.layer == Layer.Back)
+            transmute_module_cuts(mod, which_one, flipped)
+            continue  # never delete this module
+        # midboard modules that can be on either layer
+        elif mod.value.startswith('KISANDWICH-MIDBOARD'):
+            if which_one != 'MID':
+                pcb.remove(mod)
+            else:
+                continue  # keep it regardless of side, if we are doing the middle board
+        elif which_one == 'MID':
             pcb.remove(mod)
-
-    # filter again if it is one of the outer boards
-    if which_one != 'MID':
-        return core.process_modules(pcb, which_one, proc_opts)
-
+        # regular modules whose layer determines which board to go on
+        else:
+            if (
+                (which_one == 'LOW')
+                ^ (proc_opts.sandwich_type == 'inside')
+                ^ (mod.layer == Layer.Back)
+            ):
+                pcb.remove(mod)
