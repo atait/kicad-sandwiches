@@ -116,6 +116,8 @@ class KisandwichDialog(KisandwichGUI):
         # elif self.m_drawings_bondMargin.GetValue():
         elif self.m_drawings_bondAdhes.GetValue():
             sel.proc_opts.drawings.bond_masks = False
+        else:
+            sel.proc_opts.drawings.bond_masks = False
 
         sel.proc_opts.n_boards = self.n_boards
 
