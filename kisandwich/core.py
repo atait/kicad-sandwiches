@@ -34,16 +34,28 @@ map_edges = objview(
     }
 )
 
+# Silk and mask always point outwards
+# F.Adhes points inwards, and it is mirrored on both boards
+# Mid.X.Y (e.g. Mid.F.SilkS) goes on midboard, if there are three layers
 map_drawings = objview(
     TOP={
         'B.SilkS': None,
         'B.Mask': None,
-        'F.Adhes': 'B.Mask'
+        'F.Adhes': 'B.Mask',
+        'Mid.F.SilkS': None,
+        'Mid.B.SilkS': None,
+        'Mid.F.Mask': None,
+        'Mid.B.Mask': None,
     },
     LOW={
         'F.SilkS': None,
         'F.Mask': None,
-        'F.Adhes': 'F.Mask'
+        'F.Adhes': 'F.Mask',
+        'Mid.F.SilkS': None,
+        'Mid.B.SilkS': None,
+        'Mid.F.Mask': None,
+        'Mid.B.Mask': None,
+
     },
     MID={
         'F.SilkS': None,
@@ -51,6 +63,10 @@ map_drawings = objview(
         'B.SilkS': None,
         'B.Mask': None,
         # 'F.Adhes': 'F.Mask'  # TODO
+        'Mid.F.SilkS': 'F.SilkS',
+        'Mid.B.SilkS': 'B.SilkS',
+        'Mid.F.Mask': 'F.Mask',
+        'Mid.B.Mask': 'B.Mask',
     }
 )
 
@@ -194,12 +210,12 @@ def process_vias2(pcb, which_one='LOW', proc_opts=None):
                     opening_width)
 
 
-from kisandwich.three_board import process_modules3, map_copper3, process_vias3
 
 def process_all(pcb, which_one='LOW', proc_opts=None):
     ''' proc_opts is a dictionary with either functions or strings describing the steps to take '''
     global map_copper
     if proc_opts.n_boards == 3:
+        from kisandwich.three_board import process_modules3, map_copper3, process_vias3
         process_modules = process_modules3
         process_vias = process_vias3
         map_copper = map_copper3

@@ -206,8 +206,10 @@ class Kisandwich(pcbnew.ActionPlugin):
             notify('Four copper layers are needed to make a sandwich. Add more layers in board settings.')
             return
         elif n_boards > 3:
-            notify('More than three sandwich boards not supported. Get rid of some copper layers.')
-            return
+            # They might be using special layers, so allow it, but it's still only 3 boards supported
+            # notify('More than three sandwich boards not supported. Get rid of some copper layers.')
+            # return
+            n_boards = 3
 
         # show dialog
         main_dialog = KisandwichDialog(_pcbnew_frame, pcbpath, n_boards=n_boards)
