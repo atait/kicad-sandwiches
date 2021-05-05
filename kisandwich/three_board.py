@@ -36,8 +36,17 @@ map_copper3['LOW', 'inside'] = {
     'In4.Cu': None,
     'B.Cu': None,
 }
+map_copper3['STENCIL', 'inside'] = {
+    'F.Cu': None,
+    'In1.Cu': None,
+    'In2.Cu': None,
+    'In3.Cu': None,
+    'In4.Cu': None,
+    'B.Cu': None,
+}
 map_copper3[('TOP', 'outside')] = map_copper3['LOW', 'inside']
 map_copper3[('LOW', 'outside')] = map_copper3['TOP', 'inside']
+map_copper3[('STENCIL', 'outside')] = map_copper3['STENCIL', 'inside']
 map_copper3[('MID', 'outside')] = {  # except flip it
     'F.Cu': None,
     'In1.Cu': None,
@@ -65,7 +74,7 @@ def process_vias3(pcb, which_one='LOW', proc_opts=None):
 
     for via in pcb.vias:
         # Bond pad cases
-        make_pad = False
+        make_one_sided_pad = False
         if via._obj.GetViaType() in [pcbnew.VIA_MICROVIA, pcbnew.VIA_BLIND_BURIED]:
             to_midboard = (
                 via.top_layer in {'In2.Cu', 'In3.Cu'}
@@ -82,9 +91,9 @@ def process_vias3(pcb, which_one='LOW', proc_opts=None):
 
             # Simple pad to the decorative board
             if to_midboard and (to_frontboard or to_backboard):
-                make_pad = True
+                make_one_sided_pad = True
                 if to_frontboard ^ (sandwich_type == 'inside'):
-                    if which_one == 'MID':
+                    if which_one == 'MID' or which_one == 'STENCIL':
                         to_mask = ['F']
                     elif which_one == 'TOP':
                         to_mask = ['B']
@@ -92,7 +101,7 @@ def process_vias3(pcb, which_one='LOW', proc_opts=None):
                         pcb.remove(via)
                         continue
                 if to_backboard ^ (sandwich_type == 'inside'):
-                    if which_one == 'MID':
+                    if which_one == 'MID' or which_one == 'STENCIL':
                         to_mask = ['B']
                     elif which_one == 'TOP':
                         pcb.remove(via)
@@ -102,16 +111,16 @@ def process_vias3(pcb, which_one='LOW', proc_opts=None):
 
         elif via._obj.GetViaType() == pcbnew.VIA_THROUGH:
             # Bond pad through everything
-            make_pad = True
+            make_one_sided_pad = True
             if which_one == 'LOW':
                 to_mask = ['F']
             elif which_one == 'TOP':
                 to_mask = ['B']
-            elif which_one == 'MID':
+            elif which_one == 'MID' or which_one == 'STENCIL':
                 to_mask = ['F', 'B']
 
         # Make the pads
-        if make_pad:
+        if make_one_sided_pad:
             if diameter_override is not None:
                 via.diameter = diameter_override
             elif diameter_minimum is not None:
@@ -124,25 +133,23 @@ def process_vias3(pcb, which_one='LOW', proc_opts=None):
 
             opening_radius = coverage_ratio * via.diameter / 4
             opening_width = 2 * opening_radius
+            opening_kwargs = dict(center=via.center, radius=opening_radius, width=opening_width)
             if shrink_outside:
                 via.diameter = via.drill * 1.05
-
             for mask_side in to_mask:
-                pcb.add_circle(
-                    via.center,
-                    opening_radius,
-                    mask_side + '.Mask',
-                    opening_width)
+                pcb.add_circle(layer=mask_side + '.Mask', **opening_kwargs)
                 if shrink_outside:
-                    pcb.add_circle(
-                        via.center,
-                        opening_radius,
-                        mask_side + '.Cu',
-                        opening_width)
+                    pcb.add_circle(layer=mask_side + '.Cu', **opening_kwargs)
+
+            if which_one == 'STENCIL':
+                stencil_radius = 0.9 * opening_radius  # Shrink so we don't put too much paste. Will make thinner bond
+                stencil_width = 2 * stencil_radius
+                stencil_kwargs = dict(center=via.center, radius=stencil_radius, width=stencil_width)
+                for mask_side in to_mask:
+                    pcb.add_circle(layer=mask_side + '.Paste', **stencil_kwargs)
             continue
 
-
-        # Turn blind vias into regular vias. Delete ones in wrong layers
+        # Turn intra-board blind vias into regular vias. Delete ones in wrong layers
         if via._obj.GetViaType() in [pcbnew.VIA_MICROVIA, pcbnew.VIA_BLIND_BURIED]:
             toplayer = map_copper3[which_one, sandwich_type].get(via.top_layer, via.top_layer)
             if toplayer is None:
@@ -176,11 +183,11 @@ def transmute_module_cuts(mod, which_one='LOW', flipped=False, proc_opts=None):
 
 
 def process_modules3(pcb, which_one='LOW', proc_opts=None):
-    '''Use KISANDWICH-MIDBOARD in the value to designate footprint on the middle board
+    ''' Use KISANDWICH-MIDBOARD in the value to designate footprint on the middle board
         Use KISANDWICH-CUTTER to designate that drawings should be turned into cuts
     '''
     for mod in pcb.modules:
-        # cutter modules
+        # cutter modules. Keep cutters in the stencil
         if mod.value.startswith('KISANDWICH-CUTTER'):
             flipped = (mod.layer == Layer.Back)
             transmute_module_cuts(mod, which_one, flipped, proc_opts=proc_opts)
@@ -199,5 +206,6 @@ def process_modules3(pcb, which_one='LOW', proc_opts=None):
                 (which_one == 'LOW')
                 ^ (proc_opts.sandwich_type == 'inside')
                 ^ (mod.layer == Layer.Back)
+                or (which_one == 'STENCIL')
             ):
                 pcb.remove(mod)

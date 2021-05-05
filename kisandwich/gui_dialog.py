@@ -18,7 +18,7 @@ import wx.grid
 class KisandwichGUI ( wx.Dialog ):
 
     def __init__( self, parent ):
-        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"Kisandwich", pos = wx.Point( 100,100 ), size = wx.Size( 465,600 ), style = wx.DEFAULT_DIALOG_STYLE|wx.BORDER_THEME|wx.TAB_TRAVERSAL )
+        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = u"Kisandwich", pos = wx.Point( 100,100 ), size = wx.Size( 465,700 ), style = wx.DEFAULT_DIALOG_STYLE|wx.BORDER_THEME|wx.TAB_TRAVERSAL )
 
         self.SetSizeHints( wx.DefaultSize, wx.DefaultSize )
 
@@ -74,12 +74,27 @@ class KisandwichGUI ( wx.Dialog ):
 
         sbSizer1.Add( bSizer312, 1, wx.EXPAND, 5 )
 
+        bSizer313 = wx.BoxSizer( wx.HORIZONTAL )
+
+        self.m_radioBtn_STENCIL = wx.RadioButton( sbSizer1.GetStaticBox(), wx.ID_ANY, u"Stencil", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_radioBtn_STENCIL.SetMinSize( wx.Size( 100,-1 ) )
+
+        bSizer313.Add( self.m_radioBtn_STENCIL, 0, wx.EXPAND, 5 )
+
+        self.m_filePicker_STENCIL = wx.FilePickerCtrl( sbSizer1.GetStaticBox(), wx.ID_ANY, u"/home/atait/Documents/git-research/github-various/wxFormBuilder/.gitignore", u"Select a file", u"*.kicad_pcb", wx.DefaultPosition, wx.DefaultSize, wx.FLP_SAVE|wx.FLP_SMALL|wx.FLP_USE_TEXTCTRL )
+        self.m_filePicker_STENCIL.SetMinSize( wx.Size( 320,-1 ) )
+
+        bSizer313.Add( self.m_filePicker_STENCIL, 0, wx.ALL, 5 )
+
+
+        sbSizer1.Add( bSizer313, 1, wx.EXPAND, 5 )
+
         bSizer311 = wx.BoxSizer( wx.HORIZONTAL )
 
-        self.m_radioBtn_BOTH = wx.RadioButton( sbSizer1.GetStaticBox(), wx.ID_ANY, u"Both", wx.DefaultPosition, wx.DefaultSize, 0 )
-        self.m_radioBtn_BOTH.SetMinSize( wx.Size( 100,-1 ) )
+        self.m_radioBtn_ALL = wx.RadioButton( sbSizer1.GetStaticBox(), wx.ID_ANY, u"All", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_radioBtn_ALL.SetMinSize( wx.Size( 100,-1 ) )
 
-        bSizer311.Add( self.m_radioBtn_BOTH, 0, wx.EXPAND, 5 )
+        bSizer311.Add( self.m_radioBtn_ALL, 0, wx.EXPAND, 5 )
 
 
         sbSizer1.Add( bSizer311, 1, wx.EXPAND, 5 )
@@ -246,7 +261,6 @@ class KisandwichGUI ( wx.Dialog ):
         bSizer9.Add( self.m_optZones, 0, wx.ALL|wx.SHAPED, 5 )
 
         self.m_optZonesRemoveKeepouts = wx.CheckBox( self.panel_zones, wx.ID_ANY, u"Remove keepouts", wx.DefaultPosition, wx.DefaultSize, 0 )
-        self.m_optZonesRemoveKeepouts.SetValue(True)
         bSizer9.Add( self.m_optZonesRemoveKeepouts, 0, wx.ALL, 5 )
 
 
@@ -290,7 +304,8 @@ class KisandwichGUI ( wx.Dialog ):
         self.m_radioBtn_TOP.Bind( wx.EVT_RADIOBUTTON, self.on_radioboth )
         self.m_radioBtn_LOW.Bind( wx.EVT_RADIOBUTTON, self.on_radioboth )
         self.m_radioBtn_MID.Bind( wx.EVT_RADIOBUTTON, self.on_radioboth )
-        self.m_radioBtn_BOTH.Bind( wx.EVT_RADIOBUTTON, self.on_radioboth )
+        self.m_radioBtn_STENCIL.Bind( wx.EVT_RADIOBUTTON, self.on_radioboth )
+        self.m_radioBtn_ALL.Bind( wx.EVT_RADIOBUTTON, self.on_radioboth )
         self.m_chkbox_updating.Bind( wx.EVT_CHECKBOX, self.on_updating )
         self.m_chkbox_saving.Bind( wx.EVT_CHECKBOX, self.on_saving )
         self.terminal_choiceCancel.Bind( wx.EVT_BUTTON, self.cancel )
@@ -309,6 +324,7 @@ class KisandwichGUI ( wx.Dialog ):
 
     def on_radioboth( self, event ):
         event.Skip()
+
 
 
 

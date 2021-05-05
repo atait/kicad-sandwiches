@@ -31,7 +31,8 @@ map_edges = objview(
         'Margin': 'Edge.Cuts',
         'Eco1.User': None,
         'Eco2.User': None,
-    }
+    },
+    STENCIL={}
 )
 
 # Silk and mask always point outwards
@@ -67,6 +68,17 @@ map_drawings = objview(
         'Mid.B.SilkS': 'B.SilkS',
         'Mid.F.Mask': 'F.Mask',
         'Mid.B.Mask': 'B.Mask',
+    },
+    STENCIL={
+        'F.SilkS': None,
+        'F.Mask': None,
+        'B.SilkS': None,
+        'B.Mask': None,
+        'F.Adhes': None,
+        'Mid.F.SilkS': None,
+        'Mid.B.SilkS': None,
+        'Mid.F.Mask': None,
+        'Mid.B.Mask': None,
     }
 )
 
@@ -83,8 +95,15 @@ map_copper['LOW', 'inside'] = {
     # 'F.Cu': 'F.Cu',
     'B.Cu': None,
 }
+map_copper['STENCIL', 'inside'] = {
+    'In1.Cu': None,
+    'In2.Cu': None,
+    'F.Cu': None,
+    'B.Cu': None,
+}
 map_copper[('TOP', 'outside')] = map_copper['LOW', 'inside']
 map_copper[('LOW', 'outside')] = map_copper['TOP', 'inside']
+map_copper[('STENCIL', 'outside')] = map_copper['STENCIL', 'inside']
 
 
 def process_tracks(pcb, which_one='LOW', proc_opts=None):
@@ -147,6 +166,7 @@ def process_modules2(pcb, which_one='LOW', proc_opts=None):
             (which_one == 'LOW')
             ^ (proc_opts.sandwich_type == 'inside')
             ^ (mod.layer == Layer.Back)
+            or (which_one == 'STENCIL')
         ):
             pcb.remove(mod)
 
@@ -194,20 +214,21 @@ def process_vias2(pcb, which_one='LOW', proc_opts=None):
                 via.drill = drill_override
             elif drill_minimum is not None:
                 via.drill = max(via.drill, drill_minimum)
+
             opening_radius = coverage_ratio * via.diameter / 4
             opening_width = 2 * opening_radius
-            pcb.add_circle(
-                via.center,
-                opening_radius,
-                'F.Mask' if (which_one == 'LOW') else 'B.Mask',
-                opening_width)
+            opening_kwargs = dict(center=via.center, radius=opening_radius, width=opening_width)
+            mask_side = 'F' if (which_one == 'LOW') else 'B'
+            pcb.add_circle(layer=mask_side+'.Mask', **opening_kwargs)
             if shrink_outside:
                 via.diameter = via.drill * 1.05
-                pcb.add_circle(
-                    via.center,
-                    opening_radius,
-                    'F.Cu' if (which_one == 'LOW') else 'B.Cu',
-                    opening_width)
+                pcb.add_circle(layer=mask_side+'.Cu', **opening_kwargs)
+            if which_one == 'STENCIL':
+                stencil_radius = 0.9 * opening_radius  # Shrink so we don't put too much paste. Will make thinner bond
+                stencil_width = 2 * stencil_radius
+                stencil_kwargs = dict(center=via.center, radius=stencil_radius, width=stencil_width)
+                pcb.add_circle(layer='F.Paste', **stencil_kwargs)
+                pcb.add_circle(layer='B.Paste', **stencil_kwargs)
 
 
 

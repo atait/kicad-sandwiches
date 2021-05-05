@@ -37,7 +37,7 @@ class KisandwichDialog(KisandwichGUI):
             super(KisandwichDialog, self).SetSizeHints(sz1, sz2)
 
     def on_radioboth( self, event ):
-        if self.m_radioBtn_BOTH.GetValue():
+        if self.m_radioBtn_ALL.GetValue():
             self.m_chkbox_saving.SetValue(True)
             self.m_chkbox_saving.Disable()
             self.m_chkbox_updating.SetValue(False)
@@ -65,12 +65,15 @@ class KisandwichDialog(KisandwichGUI):
             sel['wich'] = 'LOW'
         elif self.m_radioBtn_MID.GetValue():
             sel['wich'] = 'MID'
-        elif self.m_radioBtn_BOTH.GetValue():
-            sel['wich'] = 'BOTH'
+        elif self.m_radioBtn_STENCIL.GetValue():
+            sel['wich'] = 'STENCIL'
+        elif self.m_radioBtn_ALL.GetValue():
+            sel['wich'] = 'ALL'
         sel['files'] = objview(
             TOP=os.path.abspath(self.m_filePicker_TOP.GetPath()),
             LOW=os.path.abspath(self.m_filePicker_LOW.GetPath()),
-            MID=os.path.abspath(self.m_filePicker_MID.GetPath())
+            MID=os.path.abspath(self.m_filePicker_MID.GetPath()),
+            STENCIL=os.path.abspath(self.m_filePicker_STENCIL.GetPath())
         )
         sel['saving'] = bool(self.m_chkbox_saving.GetValue())
         sel['refresh'] = bool(self.m_chkbox_updating.GetValue())
@@ -139,16 +142,19 @@ class KisandwichDialog(KisandwichGUI):
             self.m_filePicker_TOP.SetPath(base_to_default_boardfile(self.pcbpath, 'TOP', subdirectory='kisandwich-out'))
             self.m_filePicker_LOW.SetPath(base_to_default_boardfile(self.pcbpath, 'LOW', subdirectory='kisandwich-out'))
             self.m_filePicker_MID.SetPath(base_to_default_boardfile(self.pcbpath, 'MID', subdirectory='kisandwich-out'))
+            self.m_filePicker_STENCIL.SetPath(base_to_default_boardfile(self.pcbpath, 'STENCIL', subdirectory='kisandwich-out'))
             return
         else:
             self.m_filePicker_TOP.SetPath(sel.files.TOP)
             self.m_filePicker_LOW.SetPath(sel.files.LOW)
             self.m_filePicker_MID.SetPath(sel.files.MID)
+            self.m_filePicker_STENCIL.SetPath(sel.files.STENCIL)
 
             self.m_radioBtn_TOP.SetValue(sel.wich == 'TOP')
             self.m_radioBtn_LOW.SetValue(sel.wich == 'LOW')
             self.m_radioBtn_MID.SetValue(sel.wich == 'MID')
-            self.m_radioBtn_BOTH.SetValue(sel.wich == 'BOTH')
+            self.m_radioBtn_MID.SetValue(sel.wich == 'STENCIL')
+            self.m_radioBtn_ALL.SetValue(sel.wich == 'ALL')
             self.m_chkbox_saving.SetValue(sel.saving)
             self.m_chkbox_updating.SetValue(sel.refresh)
 
@@ -227,12 +233,14 @@ class Kisandwich(pcbnew.ActionPlugin):
         if sel['saving']:
             files = sel['files']
         else:
-            files = dict(TOP=None, LOW=None, MID=None)
+            files = dict(TOP=None, LOW=None, MID=None, STENCIL=None)
 
         script_kw = dict(refresh=sel['refresh'], proc_opts=sel['proc_opts'])
-        if sel['wich'] in ('TOP', 'BOTH'):
+        if sel['wich'] in ('TOP', 'ALL'):
             sandwich_from_gui('TOP', outfile=files['TOP'], **script_kw)
-        if sel['wich'] in ('LOW', 'BOTH'):
+        if sel['wich'] in ('LOW', 'ALL'):
             sandwich_from_gui('LOW', outfile=files['LOW'], **script_kw)
-        if n_boards == 3 and sel['wich'] in ('MID', 'BOTH'):
+        if sel['wich'] in ('STENCIL', 'ALL'):
+            sandwich_from_gui('STENCIL', outfile=files['STENCIL'], **script_kw)
+        if n_boards == 3 and sel['wich'] in ('MID', 'ALL'):
             sandwich_from_gui('MID', outfile=files['MID'], **script_kw)
