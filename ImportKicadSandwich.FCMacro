@@ -1,0 +1,78 @@
+# -*- coding: utf-8 -*-
+''' Imports three kicad sandwich boards and stacks them up in a new document
+    You will have to hit enter a few times to deal with messages from KicadStepup
+
+    To install, copy this file to ~/.FreeCAD/Macro/
+    Add a toolbar item following instructions here https://wiki.freecadweb.org/Macros
+'''
+import os
+import FreeCAD
+import kicadStepUptools
+from PySide import QtGui
+
+# Figure out the files
+mFile, _ = QtGui.QFileDialog.getOpenFileName(None, 'Select any of the sandwich boards', None, '*.kicad_pcb')
+# root_dir = u"/home/atait/Documents/hardware-projects/SkyCal/LightHole-previousWork/kisandwich-out/"
+root_dir = os.path.dirname(mFile)
+selected_basename = os.path.basename(mFile).split('.')[0]
+sandwich_group = '-'.join(selected_basename.split('_')[:-1])
+sandwich_suffixes = ['LOW', 'MID', 'TOP']
+file_fmt = os.path.join(root_dir, sandwich_group + '_{}.kicad_pcb')
+files = [file_fmt.format(suffix) for suffix in sandwich_suffixes]
+for file in files:
+    if not os.path.exists(file):
+        raise IOError('Did not find ' + file)
+
+
+def activate_window(docname):
+    # under = docname.replace('-', '_')
+    App.setActiveDocument(docname)
+    App.ActiveDocument=App.getDocument(docname)
+    Gui.ActiveDocument=Gui.getDocument(docname)
+
+# Open the boards and get the actual names of document and parts
+gui_docnames = [None, None, None]
+board_partnames = [None, None, None]
+for i in range(3):
+    print('Opening', files[i])
+    kicadStepUptools.open(files[i])
+    gui_docnames[i] = App.activeDocument().Name
+    activate_window(gui_docnames[i])
+    objs = FreeCAD.ActiveDocument.Objects
+    for ob in objs:
+        if ob.Label.startswith('Board_Geoms') and ob.Name.startswith('Board_Geoms'):
+            suffix = ob.Name.split('_')[-1]
+            actual_part_label = 'Board_' + suffix
+            board_partnames[i] = actual_part_label
+            break
+    else:
+        raise TypeError('Could not find a matching part')
+
+print('---')
+print('Parts are', board_partnames)
+App.newDocument("Stack")
+stack_doc = App.activeDocument().Name
+activate_window(stack_doc)
+
+# Copy each board model into the assembled document
+for i in range(3):
+    activate_window(gui_docnames[i])
+    Gui.Selection.addSelection(gui_docnames[i], board_partnames[i])
+    Gui.runCommand('Std_Copy',0)
+
+    activate_window(stack_doc)
+    Gui.runCommand('Std_Paste', 0)
+    Gui.Selection.clearSelection()
+
+# Stack up the boards
+def offset(mm):
+    return App.Placement(App.Vector(0,0,mm),App.Rotation(App.Vector(0,0,1),0))
+
+for i in range(3):
+    embedded_part = FreeCAD.getDocument(stack_doc).getObject(board_partnames[i])
+    embedded_part.Placement = offset(1.6 * i)
+
+# Visualization
+Gui.activeDocument().activeView().viewIsometric()
+Gui.SendMsgToActiveView("ViewFit")
+
