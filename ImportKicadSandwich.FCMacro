@@ -2,8 +2,10 @@
 ''' Imports three kicad sandwich boards and stacks them up in a new document
     You will have to hit enter a few times to deal with messages from KicadStepup
 
-    To install, copy this file to ~/.FreeCAD/Macro/
-    Add a toolbar item following instructions here https://wiki.freecadweb.org/Macros
+    To install,
+    1. copy this file to ~/.FreeCAD/Macro/
+    2. Install KicadStepUp through the package manager.
+    3. Add a toolbar item following instructions here https://wiki.freecadweb.org/Macros
 '''
 import os
 import FreeCAD
@@ -11,17 +13,18 @@ import kicadStepUptools
 from PySide import QtGui
 
 # Figure out the files
-mFile, _ = QtGui.QFileDialog.getOpenFileName(None, 'Select any of the sandwich boards', None, '*.kicad_pcb')
-# root_dir = u"/home/atait/Documents/hardware-projects/SkyCal/LightHole-previousWork/kisandwich-out/"
+mFile, _ = QtGui.QFileDialog.getOpenFileName(None, 'Select any of the sandwich boards', None, '*.kicad_pcb *.wrl')
 root_dir = os.path.dirname(mFile)
-selected_basename = os.path.basename(mFile).split('.')[0]
+selected_basename, extension = os.path.splitext(os.path.basename(mFile))
+use_stepup = extension == '.kicad_pcb'
 sandwich_group = '-'.join(selected_basename.split('_')[:-1])
 sandwich_suffixes = ['LOW', 'MID', 'TOP']
-file_fmt = os.path.join(root_dir, sandwich_group + '_{}.kicad_pcb')
+file_fmt = os.path.join(root_dir, sandwich_group + '_{}' + extension)
 files = [file_fmt.format(suffix) for suffix in sandwich_suffixes]
 for file in files:
     if not os.path.exists(file):
-        raise IOError('Did not find ' + file)
+        raise IOError('Did not find kisandwich file: ' + file)
+gui_docnames = [sandwich_group.replace('-', '_') + '_{}'.format(suffix) for suffix in sandwich_suffixes]
 
 
 def activate_window(docname):
@@ -31,12 +34,11 @@ def activate_window(docname):
     Gui.ActiveDocument=Gui.getDocument(docname)
 
 # Open the boards and get the actual names of document and parts
-gui_docnames = [None, None, None]
 board_partnames = [None, None, None]
 for i in range(3):
     print('Opening', files[i])
     kicadStepUptools.open(files[i])
-    gui_docnames[i] = App.activeDocument().Name
+    gui_docnames[i] = App.activeDocument().Name  # Sometimes it is different for uniqueness
     activate_window(gui_docnames[i])
     objs = FreeCAD.ActiveDocument.Objects
     for ob in objs:
@@ -46,13 +48,14 @@ for i in range(3):
             board_partnames[i] = actual_part_label
             break
     else:
-        raise TypeError('Could not find a matching part')
+        raise TypeError('Could not find a part starting with "Board_Geoms"')
 
-print('---')
-print('Parts are', board_partnames)
+# print('---')
+# print('Parts are', board_partnames)
 App.newDocument("Stack")
 stack_doc = App.activeDocument().Name
 activate_window(stack_doc)
+
 
 # Copy each board model into the assembled document
 for i in range(3):
@@ -64,6 +67,7 @@ for i in range(3):
     Gui.runCommand('Std_Paste', 0)
     Gui.Selection.clearSelection()
 
+
 # Stack up the boards
 def offset(mm):
     return App.Placement(App.Vector(0,0,mm),App.Rotation(App.Vector(0,0,1),0))
@@ -71,6 +75,7 @@ def offset(mm):
 for i in range(3):
     embedded_part = FreeCAD.getDocument(stack_doc).getObject(board_partnames[i])
     embedded_part.Placement = offset(1.6 * i)
+
 
 # Visualization
 Gui.activeDocument().activeView().viewIsometric()
