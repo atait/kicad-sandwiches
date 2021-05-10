@@ -27,6 +27,10 @@ map_copper3['MID', 'inside'] = {
     'In3.Cu': 'F.Cu',
     'In4.Cu': None,
     'B.Cu': None,
+    'Mid.F.SilkS': 'F.SilkS',
+    'Mid.B.SilkS': 'B.SilkS',
+    'Mid.F.Mask': 'F.Mask',
+    'Mid.B.Mask': 'B.Mask',
 }  # mid is the decorative/structural board
 map_copper3['LOW', 'inside'] = {
     'F.Cu': 'F.Cu',
