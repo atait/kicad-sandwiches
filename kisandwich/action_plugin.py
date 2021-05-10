@@ -85,7 +85,7 @@ class KisandwichDialog(KisandwichGUI):
             drawings=bool(self.m_optDrawings.GetValue()),
             modules=bool(self.m_optModules.GetValue()),
             vias=bool(self.m_optVias.GetValue()),
-            zones=bool(self.m_optZones.GetValue())
+            zones=bool(self.m_optZones.GetValue()),
         )
 
         sel.proc_opts.vias = objview(
@@ -121,6 +121,9 @@ class KisandwichDialog(KisandwichGUI):
             sel.proc_opts.drawings.bond_masks = False
         else:
             sel.proc_opts.drawings.bond_masks = False
+
+        sel.proc_opts.stencil = objview()
+        sel.proc_opts.stencil.fill_ratio = float(self.m_stencil_fill.GetValue())
 
         sel.proc_opts.n_boards = self.n_boards
 
@@ -183,6 +186,8 @@ class KisandwichDialog(KisandwichGUI):
 
             self.m_drawings_bondMasks.SetValue(sel.proc_opts.drawings.bond_masks is True)
             self.m_drawings_bondMargin.SetValue(sel.proc_opts.drawings.bond_masks is False)
+
+            self.m_stencil_fill.SetValue('{:.2f}'.format(sel.proc_opts.stencil.fill_ratio))
 
 
 class Kisandwich(pcbnew.ActionPlugin):
