@@ -139,7 +139,11 @@ def process_vias3(pcb, which_one='LOW', proc_opts=None):
             for mask_side in to_mask:
                 pcb.add_circle(layer=mask_side + '.Mask', **opening_kwargs)
                 if shrink_outside:
-                    pcb.add_circle(layer=mask_side + '.Cu', **opening_kwargs)
+                    start = via.center - (0.001, 0)
+                    end = via.center + (0.001, 0)
+                    pad = pcb.add_track_segment(start=start, end=end, layer=mask_side+'.Cu', width=2*opening_radius+opening_width)
+                    pad.netName = via.netName
+                    # pcb.add_circle(layer=mask_side + '.Cu', **opening_kwargs)
 
             if which_one == 'STENCIL':
                 x = proc_opts.stencil.get('fill_ratio', 0.6)

@@ -227,7 +227,11 @@ def process_vias2(pcb, which_one='LOW', proc_opts=None):
             pcb.add_circle(layer=mask_side+'.Mask', **opening_kwargs)
             if shrink_outside:
                 via.diameter = via.drill * 1.05
-                pcb.add_circle(layer=mask_side+'.Cu', **opening_kwargs)
+                start = via.center - (0.001, 0)
+                end = via.center + (0.001, 0)
+                pad = pcb.add_track_segment(start=start, end=end, layer=mask_side+'.Cu', width=2*opening_radius+opening_width)
+                pad.netName = via.netName
+                # pcb.add_circle(layer=mask_side+'.Cu', **opening_kwargs)
             if which_one == 'STENCIL':
                 x = proc_opts.stencil.get('fill_ratio', 0.6)
                 stencil_radius = x * opening_radius + (1-x) * (via.drill / 4)  # Shrink so we don't put too much paste. Will make thinner bond
