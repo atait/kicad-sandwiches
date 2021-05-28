@@ -19,6 +19,10 @@ map_copper3['TOP', 'inside'] = {
     'In3.Cu': None,
     'In4.Cu': 'F.Cu',
     'B.Cu': 'B.Cu',
+    'Mid.F.SilkS': None,
+    'Mid.B.SilkS': None,
+    'Mid.F.Mask': None,
+    'Mid.B.Mask': None,
 }
 map_copper3['MID', 'inside'] = {
     'F.Cu': None,
@@ -39,6 +43,10 @@ map_copper3['LOW', 'inside'] = {
     'In3.Cu': None,
     'In4.Cu': None,
     'B.Cu': None,
+    'Mid.F.SilkS': None,
+    'Mid.B.SilkS': None,
+    'Mid.F.Mask': None,
+    'Mid.B.Mask': None,
 }
 map_copper3['STENCIL', 'inside'] = {
     'F.Cu': None,
@@ -47,6 +55,10 @@ map_copper3['STENCIL', 'inside'] = {
     'In3.Cu': None,
     'In4.Cu': None,
     'B.Cu': None,
+    'Mid.F.SilkS': None,
+    'Mid.B.SilkS': None,
+    'Mid.F.Mask': None,
+    'Mid.B.Mask': None,
 }
 map_copper3[('TOP', 'outside')] = map_copper3['LOW', 'inside']
 map_copper3[('LOW', 'outside')] = map_copper3['TOP', 'inside']

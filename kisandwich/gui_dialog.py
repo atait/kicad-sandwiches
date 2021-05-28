@@ -215,7 +215,7 @@ class KisandwichGUI ( wx.Dialog ):
 
         gSizer1.Add( self.m_staticText4, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT, 5 )
 
-        self.m_bpopt_maskCoverage = wx.TextCtrl( self.panel_pads, wx.ID_ANY, u"1.1", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_bpopt_maskCoverage = wx.TextCtrl( self.panel_pads, wx.ID_ANY, u"1.05", wx.DefaultPosition, wx.DefaultSize, 0 )
         gSizer1.Add( self.m_bpopt_maskCoverage, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
 
         self.m_staticText10 = wx.StaticText( self.panel_pads, wx.ID_ANY, u"Minima", wx.DefaultPosition, wx.DefaultSize, 0 )
@@ -281,7 +281,7 @@ class KisandwichGUI ( wx.Dialog ):
 
         bSizer91.Add( self.m_staticText131, 0, wx.ALIGN_CENTER|wx.ALL, 5 )
 
-        self.m_stencil_fill = wx.TextCtrl( self.panel_stencil, wx.ID_ANY, u"0.6", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_stencil_fill = wx.TextCtrl( self.panel_stencil, wx.ID_ANY, u"0.8", wx.DefaultPosition, wx.DefaultSize, 0 )
         bSizer91.Add( self.m_stencil_fill, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
 
 
