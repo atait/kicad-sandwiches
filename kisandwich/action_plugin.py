@@ -86,6 +86,7 @@ class KisandwichDialog(KisandwichGUI):
             modules=bool(self.m_optModules.GetValue()),
             vias=bool(self.m_optVias.GetValue()),
             zones=bool(self.m_optZones.GetValue()),
+            stencil=bool(self.m_optStencilMid.GetValue()),
         )
 
         sel.proc_opts.vias = objview(
@@ -170,6 +171,7 @@ class KisandwichDialog(KisandwichGUI):
             self.m_optModules.SetValue(sel.proc_opts.enable.modules)
             self.m_optVias.SetValue(sel.proc_opts.enable.vias)
             self.m_optZones.SetValue(sel.proc_opts.enable.zones)
+            self.m_optStencilMid.SetValue(sel.proc_opts.enable.stencil)
 
             def default_str(textctrl, key):
                 if key in sel.proc_opts.vias:
@@ -245,7 +247,7 @@ class Kisandwich(pcbnew.ActionPlugin):
             sandwich_from_gui('TOP', outfile=files['TOP'], **script_kw)
         if sel['wich'] in ('LOW', 'ALL'):
             sandwich_from_gui('LOW', outfile=files['LOW'], **script_kw)
-        if sel['wich'] in ('STENCIL', 'ALL'):
-            sandwich_from_gui('STENCIL', outfile=files['STENCIL'], **script_kw)
+        # if sel['wich'] in ('STENCIL', 'ALL'):
+        #     sandwich_from_gui('STENCIL', outfile=files['STENCIL'], **script_kw)
         if n_boards == 3 and sel['wich'] in ('MID', 'ALL'):
             sandwich_from_gui('MID', outfile=files['MID'], **script_kw)

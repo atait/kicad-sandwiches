@@ -77,11 +77,13 @@ class KisandwichGUI ( wx.Dialog ):
         bSizer313 = wx.BoxSizer( wx.HORIZONTAL )
 
         self.m_radioBtn_STENCIL = wx.RadioButton( sbSizer1.GetStaticBox(), wx.ID_ANY, u"Stencil", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_radioBtn_STENCIL.Enable( False )
         self.m_radioBtn_STENCIL.SetMinSize( wx.Size( 100,-1 ) )
 
         bSizer313.Add( self.m_radioBtn_STENCIL, 0, wx.EXPAND, 5 )
 
         self.m_filePicker_STENCIL = wx.FilePickerCtrl( sbSizer1.GetStaticBox(), wx.ID_ANY, u"/home/atait/Documents/git-research/github-various/wxFormBuilder/.gitignore", u"Select a file", u"*.kicad_pcb", wx.DefaultPosition, wx.DefaultSize, wx.FLP_SAVE|wx.FLP_SMALL|wx.FLP_USE_TEXTCTRL )
+        self.m_filePicker_STENCIL.Enable( False )
         self.m_filePicker_STENCIL.SetMinSize( wx.Size( 320,-1 ) )
 
         bSizer313.Add( self.m_filePicker_STENCIL, 0, wx.ALL, 5 )
@@ -215,7 +217,7 @@ class KisandwichGUI ( wx.Dialog ):
 
         gSizer1.Add( self.m_staticText4, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT, 5 )
 
-        self.m_bpopt_maskCoverage = wx.TextCtrl( self.panel_pads, wx.ID_ANY, u"1.05", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_bpopt_maskCoverage = wx.TextCtrl( self.panel_pads, wx.ID_ANY, u"1.00", wx.DefaultPosition, wx.DefaultSize, 0 )
         gSizer1.Add( self.m_bpopt_maskCoverage, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
 
         self.m_staticText10 = wx.StaticText( self.panel_pads, wx.ID_ANY, u"Minima", wx.DefaultPosition, wx.DefaultSize, 0 )
@@ -269,20 +271,34 @@ class KisandwichGUI ( wx.Dialog ):
         bSizer9.Fit( self.panel_zones )
         self.m_listbook1.AddPage( self.panel_zones, u"Zones", False )
         self.panel_stencil = wx.Panel( self.m_listbook1, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.BORDER_RAISED|wx.TAB_TRAVERSAL )
-        bSizer91 = wx.BoxSizer( wx.HORIZONTAL )
+        bSizer91 = wx.BoxSizer( wx.VERTICAL )
 
-        self.m_staticText13 = wx.StaticText( self.panel_stencil, wx.ID_ANY, u"Fill radius ratio\nR = x R_pad + (1-x) R_drill", wx.DefaultPosition, wx.DefaultSize, 0 )
-        self.m_staticText13.Wrap( -1 )
+        bSizer14 = wx.BoxSizer( wx.HORIZONTAL )
 
-        bSizer91.Add( self.m_staticText13, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT|wx.ALL, 5 )
+        self.m_optStencilMid = wx.CheckBox( self.panel_stencil, wx.ID_ANY, u"Put stencil paste on MIDBOARD", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_optStencilMid.SetValue(True)
+        bSizer14.Add( self.m_optStencilMid, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
 
-        self.m_staticText131 = wx.StaticText( self.panel_stencil, wx.ID_ANY, u"... x=", wx.DefaultPosition, wx.DefaultSize, 0 )
-        self.m_staticText131.Wrap( -1 )
 
-        bSizer91.Add( self.m_staticText131, 0, wx.ALIGN_CENTER|wx.ALL, 5 )
+        bSizer91.Add( bSizer14, 1, wx.EXPAND, 5 )
+
+        bSizer141 = wx.BoxSizer( wx.HORIZONTAL )
+
+        self.m_staticText132 = wx.StaticText( self.panel_stencil, wx.ID_ANY, u"Fill radius ratio\nR = x R_pad + (1-x) R_drill", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText132.Wrap( -1 )
+
+        bSizer141.Add( self.m_staticText132, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT|wx.ALL, 5 )
+
+        self.m_staticText1311 = wx.StaticText( self.panel_stencil, wx.ID_ANY, u"... x=", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText1311.Wrap( -1 )
+
+        bSizer141.Add( self.m_staticText1311, 0, wx.ALIGN_CENTER|wx.ALL, 5 )
 
         self.m_stencil_fill = wx.TextCtrl( self.panel_stencil, wx.ID_ANY, u"0.8", wx.DefaultPosition, wx.DefaultSize, 0 )
-        bSizer91.Add( self.m_stencil_fill, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+        bSizer141.Add( self.m_stencil_fill, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+
+
+        bSizer91.Add( bSizer141, 1, wx.EXPAND, 5 )
 
 
         self.panel_stencil.SetSizer( bSizer91 )

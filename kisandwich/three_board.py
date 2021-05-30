@@ -161,8 +161,8 @@ def process_vias3(pcb, which_one='LOW', proc_opts=None):
                     pad.netName = via.netName
                     # pcb.add_circle(layer=mask_side + '.Cu', **opening_kwargs)
 
-            if which_one == 'STENCIL':
-                x = proc_opts.stencil.get('fill_ratio', 0.6)
+            if which_one == 'STENCIL' or which_one == 'MID' and proc_opts.enable.stencil:
+                x = proc_opts.stencil.get('fill_ratio', 0.8)
                 stencil_radius = x * opening_radius + (1-x) * (via.drill / 4)  # Shrink so we don't put too much paste. Will make thinner bond
                 stencil_width = 2 * stencil_radius
                 stencil_kwargs = dict(center=via.center, radius=stencil_radius, width=stencil_width)
