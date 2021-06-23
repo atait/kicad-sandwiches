@@ -294,7 +294,7 @@ class KisandwichGUI ( wx.Dialog ):
 
         bSizer141.Add( self.m_staticText1311, 0, wx.ALIGN_CENTER|wx.ALL, 5 )
 
-        self.m_stencil_fill = wx.TextCtrl( self.panel_stencil, wx.ID_ANY, u"0.8", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_stencil_fill = wx.TextCtrl( self.panel_stencil, wx.ID_ANY, u"1.0", wx.DefaultPosition, wx.DefaultSize, 0 )
         bSizer141.Add( self.m_stencil_fill, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
 
 
