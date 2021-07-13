@@ -143,6 +143,8 @@ class KisandwichDialog(KisandwichGUI):
             raise ValueError('Wrong number of boards: ' + str(self.n_boards))
 
         if sel is None:
+            self.m_radioBtn_TOP.SetValue(True)
+            self.m_modules_inside.SetValue(True)
             self.m_filePicker_TOP.SetPath(base_to_default_boardfile(self.pcbpath, 'TOP', subdirectory='kisandwich-out'))
             self.m_filePicker_LOW.SetPath(base_to_default_boardfile(self.pcbpath, 'LOW', subdirectory='kisandwich-out'))
             self.m_filePicker_MID.SetPath(base_to_default_boardfile(self.pcbpath, 'MID', subdirectory='kisandwich-out'))
