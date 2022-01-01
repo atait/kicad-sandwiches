@@ -29,12 +29,12 @@ class KisandwichDialog(KisandwichGUI):
 
     # hack for new wxFormBuilder generating code incompatible with old wxPython
     def SetSizeHints(self, sz1, sz2):
-        try:
-            # wxPython 3
-            self.SetSizeHintsSz(sz1, sz2)
-        except TypeError:
-            # wxPython 4
-            super(KisandwichDialog, self).SetSizeHints(sz1, sz2)
+        # try:
+        #     # wxPython 3
+        #     self.SetSizeHintsSz(sz1, sz2)
+        # except TypeError:
+        # wxPython 4
+        super(KisandwichDialog, self).SetSizeHints(sz1, sz2)
 
     def on_radioboth( self, event ):
         if self.m_radioBtn_ALL.GetValue():
@@ -213,7 +213,7 @@ class Kisandwich(pcbnew.ActionPlugin):
         # go to the project folder - so that log will be in proper place
         os.chdir(os.path.dirname(os.path.abspath(pcbpath)))
         # find pcbnew frame
-        _pcbnew_frame = [x for x in wx.GetTopLevelWindows() if x.GetTitle().lower().startswith('pcbnew')][0]
+        _pcbnew_frame = [x for x in wx.GetTopLevelWindows() if 'PCB Editor' in x.GetTitle()][0]
 
         # How many boards are in the layer set
         n_boards = livepcb.GetCopperLayerCount() // 2
