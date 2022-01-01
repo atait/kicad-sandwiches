@@ -194,23 +194,23 @@ def process_vias2(pcb, which_one='LOW', proc_opts=None):
 
     for via in pcb.vias:
         # Turn blind vias into regular vias. Delete ones in wrong layers
-        if via._obj.GetViaType() in [pcbnew.VIA_MICROVIA, pcbnew.VIA_BLIND_BURIED]:
+        if not via.is_through:
             toplayer = map_copper[which_one, sandwich_type].get(via.top_layer, via.top_layer)
             if toplayer is None:
                 pcb.remove(via)
             else:
                 via.top_layer = toplayer
-                via._obj.SetViaType(pcbnew.VIA_THROUGH)
+                via.is_through = True
 
             bottomlayer = map_copper[which_one, sandwich_type].get(via.bottom_layer, via.bottom_layer)
             if bottomlayer is None:
                 pcb.remove(via)
             else:
                 via.bottom_layer = bottomlayer
-                via._obj.SetViaType(pcbnew.VIA_THROUGH)
+                via.is_through = True
 
         # Make open bond pads
-        elif via._obj.GetViaType() == pcbnew.VIA_THROUGH:
+        elif via.is_through:
             if diameter_override is not None:
                 via.diameter = diameter_override
             elif diameter_minimum is not None:

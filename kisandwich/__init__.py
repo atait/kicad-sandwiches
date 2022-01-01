@@ -9,7 +9,6 @@ class objview(dict):
     def __setattr__(self, attr, val):
         self.__setitem__(attr, val)
 
-
 try:
     expose_kicad_python()
     from kisandwich import action_plugin, core, gui_dialog

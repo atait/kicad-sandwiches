@@ -91,7 +91,7 @@ def process_vias3(pcb, which_one='LOW', proc_opts=None):
     for via in pcb.vias:
         # Bond pad cases
         make_one_sided_pad = False
-        if via._obj.GetViaType() in [pcbnew.VIA_MICROVIA, pcbnew.VIA_BLIND_BURIED]:
+        if not via.is_through:
             to_midboard = (
                 via.top_layer in {'In2.Cu', 'In3.Cu'}
                 or via.bottom_layer in {'In2.Cu', 'In3.Cu'}
@@ -125,7 +125,7 @@ def process_vias3(pcb, which_one='LOW', proc_opts=None):
                     elif which_one == 'LOW':
                         to_mask = ['F']
 
-        elif via._obj.GetViaType() == pcbnew.VIA_THROUGH:
+        elif via.is_through:
             # Bond pad through everything
             make_one_sided_pad = True
             if which_one == 'LOW':
@@ -145,7 +145,7 @@ def process_vias3(pcb, which_one='LOW', proc_opts=None):
                 via.drill = drill_override
             elif drill_minimum is not None:
                 via.drill = max(via.drill, drill_minimum)
-            via._obj.SetViaType(pcbnew.VIA_THROUGH)
+            via.is_through = True
 
             opening_radius = coverage_ratio * via.diameter / 4
             opening_width = 2 * opening_radius
@@ -171,20 +171,20 @@ def process_vias3(pcb, which_one='LOW', proc_opts=None):
             continue
 
         # Turn intra-board blind vias into regular vias. Delete ones in wrong layers
-        if via._obj.GetViaType() in [pcbnew.VIA_MICROVIA, pcbnew.VIA_BLIND_BURIED]:
+        if not via.is_through:
             toplayer = map_copper3[which_one, sandwich_type].get(via.top_layer, via.top_layer)
             if toplayer is None:
                 pcb.remove(via)
             else:
                 via.top_layer = toplayer
-                via._obj.SetViaType(pcbnew.VIA_THROUGH)
+                via.is_through = True
 
             bottomlayer = map_copper3[which_one, sandwich_type].get(via.bottom_layer, via.bottom_layer)
             if bottomlayer is None:
                 pcb.remove(via)
             else:
                 via.bottom_layer = bottomlayer
-                via._obj.SetViaType(pcbnew.VIA_THROUGH)
+                via.is_through = True
 
 
 def transmute_module_cuts(mod, which_one='LOW', flipped=False, proc_opts=None):
