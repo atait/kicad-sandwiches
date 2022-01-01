@@ -18,70 +18,70 @@ from kisandwich import objview
 
 map_edges = objview(
     TOP={
-        'Eco1.User': 'Edge.Cuts',
-        'Eco2.User': None,
+        'User.Eco1': 'Edge.Cuts',
+        'User.Eco2': None,
         'Margin': None,
     },
     LOW={
-        'Eco2.User': 'Edge.Cuts',
-        'Eco1.User': None,
+        'User.Eco2': 'Edge.Cuts',
+        'User.Eco1': None,
         'Margin': None,
     },
     MID={
         'Margin': 'Edge.Cuts',
-        'Eco1.User': None,
-        'Eco2.User': None,
+        'User.Eco1': None,
+        'User.Eco2': None,
     },
     STENCIL={
         'Margin': None,
-        'Eco1.User': None,
-        'Eco2.User': None,
+        'User.Eco1': None,
+        'User.Eco2': None,
         'Edge.Cuts': None,
     }
 )
 
 # Silk and mask always point outwards
-# F.Adhes points inwards, and it is mirrored on both boards
-# Mid.X.Y (e.g. Mid.F.SilkS) goes on midboard, if there are three layers
+# F.Adhesive points inwards, and it is mirrored on both boards
+# Mid.X.Y (e.g. Mid.F.Silkscreen) goes on midboard, if there are three layers
 map_drawings = objview(
     TOP={
-        'B.SilkS': None,
+        'B.Silkscreen': None,
         'B.Mask': None,
-        'F.Adhes': 'B.Mask',
-        'Mid.F.SilkS': None,
-        'Mid.B.SilkS': None,
+        'F.Adhesive': 'B.Mask',
+        'Mid.F.Silkscreen': None,
+        'Mid.B.Silkscreen': None,
         'Mid.F.Mask': None,
         'Mid.B.Mask': None,
     },
     LOW={
-        'F.SilkS': None,
+        'F.Silkscreen': None,
         'F.Mask': None,
-        'F.Adhes': 'F.Mask',
-        'Mid.F.SilkS': None,
-        'Mid.B.SilkS': None,
+        'F.Adhesive': 'F.Mask',
+        'Mid.F.Silkscreen': None,
+        'Mid.B.Silkscreen': None,
         'Mid.F.Mask': None,
         'Mid.B.Mask': None,
 
     },
     MID={
-        'F.SilkS': None,
+        'F.Silkscreen': None,
         'F.Mask': None,
-        'B.SilkS': None,
+        'B.Silkscreen': None,
         'B.Mask': None,
-        # 'F.Adhes': 'F.Mask'  # TODO
-        'Mid.F.SilkS': 'F.SilkS',
-        'Mid.B.SilkS': 'B.SilkS',
+        # 'F.Adhesive': 'F.Mask'  # TODO
+        'Mid.F.Silkscreen': 'F.Silkscreen',
+        'Mid.B.Silkscreen': 'B.Silkscreen',
         'Mid.F.Mask': 'F.Mask',
         'Mid.B.Mask': 'B.Mask',
     },
     STENCIL={
-        'F.SilkS': None,
+        'F.Silkscreen': None,
         'F.Mask': None,
-        'B.SilkS': None,
+        'B.Silkscreen': None,
         'B.Mask': None,
-        'F.Adhes': None,
-        'Mid.F.SilkS': None,
-        'Mid.B.SilkS': None,
+        'F.Adhesive': None,
+        'Mid.F.Silkscreen': None,
+        'Mid.B.Silkscreen': None,
         'Mid.F.Mask': None,
         'Mid.B.Mask': None,
     }
@@ -140,19 +140,19 @@ def process_drawings(pcb, which_one='LOW', proc_opts=None):
     if proc_opts is not None and proc_opts.drawings.bond_masks:
         if which_one == 'TOP':
             my_map = {
-                'B.SilkS': None,
+                'B.Silkscreen': None,
                 'F.Mask': None
             }
         elif which_one == 'LOW':
             my_map = {
-                'F.SilkS': None,
+                'F.Silkscreen': None,
                 'B.Mask': None
             }
         elif which_one == 'MID':  # For now there is no way to control silk and mask of mid board
             my_map = {
-                'F.SilkS': None,
+                'F.Silkscreen': None,
                 'B.Mask': None,
-                'B.SilkS': None,
+                'B.Silkscreen': None,
                 'F.Mask': None
             }
     for dw in pcb.drawings:
