@@ -111,6 +111,17 @@ map_copper[('LOW', 'outside')] = map_copper['TOP', 'inside']
 map_copper[('STENCIL', 'outside')] = map_copper['STENCIL', 'inside']
 
 
+proc_opts_default = objview(
+    enable = objview(tracks=True, drawings=True, modules=True, vias=True, zones=True, stencil=True),
+    sandwich_type = 'inside',
+    n_boards = 3,
+    stencil = objview(fill_ratio=1.0),
+    vias = objview(coverage_ratio=1.0, shrink=True),
+    zones = objview(remove_keepouts=True),
+    drawings = objview(bond_masks=False),
+)
+
+
 def process_tracks(pcb, which_one='LOW', proc_opts=None):
     sandwich_type = proc_opts.sandwich_type
     for tr in pcb.tracks:
@@ -269,6 +280,7 @@ def process_all(pcb, which_one='LOW', proc_opts=None):
 ### Entry points
 def sandwich_from_gui(which_one='LOW', refresh=False, outfile=None, proc_opts=None):
     livepcb = Board.from_editor()
+    livepath = livepcb.filename
     if refresh:
         process_all(livepcb, which_one, proc_opts=proc_opts)
         pcbnew.Refresh()
@@ -296,10 +308,13 @@ def base_to_default_boardfile(filepath, which_one='LOW', subdirectory=''):
     return os.path.join(newdir, newbase)
 
 
-def sandwich_from_file(infile, which_one='LOW', outfile=None):
+def sandwich_from_file(infile, which_one='LOW', outfile=None, proc_opts=None):
     ''' The CLI '''
     if outfile is None:
         outfile = base_to_default_boardfile(infile, which_one)
+    proc_opts_full = proc_opts_default.copy()
+    if proc_opts is not None:
+        proc_opts_full.update(proc_opts)
     workingpcb = Board.load(infile)
-    process_all(workingpcb, which_one)
+    process_all(workingpcb, which_one, proc_opts_full)
     workingpcb.save(outfile)

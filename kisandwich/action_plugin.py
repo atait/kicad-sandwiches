@@ -5,7 +5,7 @@ import os, sys
 from atait_scripting_support import notify, reload
 
 from . import core
-from .core import sandwich_from_gui, process_all, base_to_default_boardfile, objview
+from .core import sandwich_from_gui, process_all, base_to_default_boardfile, objview, proc_opts_default
 from . import gui_dialog
 from .gui_dialog import KisandwichGUI
 
