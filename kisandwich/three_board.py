@@ -10,7 +10,6 @@ from kisandwich import objview
 import kisandwich.core as core
 
 
-# Method 2
 map_copper3 = dict()
 map_copper3['TOP', 'inside'] = {
     'F.Cu': None,
@@ -189,18 +188,23 @@ def process_vias3(pcb, which_one='LOW', proc_opts=None):
 
 def transmute_module_cuts(mod, which_one='LOW', flipped=False, proc_opts=None):
     ''' Change Eco1, Eco2, and Margin to Edge.Cuts or delete, depending on which board
+        Also maps/deletes non-pad copper
+        Pad copper is removed if on the wrong side or through hole
     '''
-    which_one_eco = which_one
+    which_one_edges = which_one
     if flipped:
-        which_one_eco = {'LOW': 'TOP', 'TOP': 'LOW', 'MID': 'MID'}[which_one]
-    the_map = core.map_edges[which_one_eco]
+        which_one_edges = {'LOW': 'TOP', 'TOP': 'LOW', 'MID': 'MID'}[which_one]
+    to_remove = set()
     for dw in mod.graphicalItems:
-        dw_layer = the_map.get(dw.layer, dw.layer)
+        dw_layer = core.map_edges[which_one_edges].get(dw.layer, dw.layer)
         dw_layer = map_copper3[which_one, proc_opts.sandwich_type].get(dw_layer, dw_layer)
+        dw_layer = core.map_drawings[which_one].get(dw_layer, dw_layer)
         if dw_layer is None:
-            mod.remove(dw)
+            to_remove.add(dw)
         else:
             dw.layer = dw_layer
+    for dw in to_remove:
+        mod.remove(dw)
 
 
 def process_modules3(pcb, which_one='LOW', proc_opts=None):
