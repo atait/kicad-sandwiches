@@ -21,19 +21,23 @@ map_edges = objview(
         'User.Eco1': 'Edge.Cuts',
         'User.Eco2': None,
         'Margin': None,
+        'User.3': None,
     },
     LOW={
         'User.Eco2': 'Edge.Cuts',
         'User.Eco1': None,
         'Margin': None,
+        'User.3': None,
     },
     MID={
         'Margin': 'Edge.Cuts',
+        'User.3': 'Edge.Cuts',
         'User.Eco1': None,
         'User.Eco2': None,
     },
     STENCIL={
         'Margin': None,
+        'User.3': None,
         'User.Eco1': None,
         'User.Eco2': None,
         'Edge.Cuts': None,
@@ -47,7 +51,8 @@ map_drawings = objview(
     TOP={
         'B.Silkscreen': None,
         'B.Mask': None,
-        'F.Adhesive': 'B.Mask',
+        'F.Adhesive': None,
+        'B.Adhesive': 'B.Mask',
         'Mid.F.Silkscreen': None,
         'Mid.B.Silkscreen': None,
         'Mid.F.Mask': None,
@@ -57,18 +62,19 @@ map_drawings = objview(
         'F.Silkscreen': None,
         'F.Mask': None,
         'F.Adhesive': 'F.Mask',
+        'B.Adhesive': None,
         'Mid.F.Silkscreen': None,
         'Mid.B.Silkscreen': None,
         'Mid.F.Mask': None,
         'Mid.B.Mask': None,
-
     },
     MID={
         'F.Silkscreen': None,
         'F.Mask': None,
         'B.Silkscreen': None,
         'B.Mask': None,
-        # 'F.Adhesive': 'F.Mask'  # TODO
+        'F.Adhesive': None,
+        'B.Adhesive': None,
         'Mid.F.Silkscreen': 'F.Silkscreen',
         'Mid.B.Silkscreen': 'B.Silkscreen',
         'Mid.F.Mask': 'F.Mask',
@@ -77,9 +83,10 @@ map_drawings = objview(
     STENCIL={
         'F.Silkscreen': None,
         'F.Mask': None,
+        'F.Adhesive': None,
         'B.Silkscreen': None,
         'B.Mask': None,
-        'F.Adhesive': None,
+        'B.Adhesive': None,
         'Mid.F.Silkscreen': None,
         'Mid.B.Silkscreen': None,
         'Mid.F.Mask': None,
@@ -293,14 +300,8 @@ def sandwich_from_gui(which_one='LOW', refresh=False, outfile=None, proc_opts=No
         if outfile is not None:
             livepcb.save(outfile)
     elif outfile is not None:
-        tempfile = '~sandwich-temp.kicad_pcb'
-        livepcb.save(tempfile)
-        try:
-            workingpcb = Board.load(tempfile)
-            process_all(workingpcb, which_one, proc_opts=proc_opts)
-            workingpcb.save(outfile)
-        finally:
-            os.remove(tempfile)
+        livepcb.save(outfile)
+        sandwich_from_file(outfile, which_one, outfile, proc_opts)
 
 
 def base_to_default_boardfile(filepath, which_one='LOW', subdirectory=''):
