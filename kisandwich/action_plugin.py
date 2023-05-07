@@ -241,6 +241,7 @@ class Kisandwich(pcbnew.ActionPlugin):
         # sanitize values
         if sel['saving']:
             files = sel['files']
+            sel['refresh'] = False
         else:
             files = dict(TOP=None, LOW=None, MID=None, STENCIL=None)
 

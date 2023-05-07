@@ -1,5 +1,5 @@
 import traceback
-from atait_scripting_support import reload, notify, expose_kicad_python
+from atait_scripting_support import reload, notify
 
 
 class objview(dict):
@@ -9,8 +9,11 @@ class objview(dict):
     def __setattr__(self, attr, val):
         self.__setitem__(attr, val)
 
+    def copy(self):
+        return objview(super().copy())
+
 try:
-    expose_kicad_python()
+    # expose_kicad_python()
     from kisandwich import action_plugin, core, gui_dialog
     reload(action_plugin)
     reload(core)

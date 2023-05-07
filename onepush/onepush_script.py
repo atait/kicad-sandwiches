@@ -26,7 +26,7 @@
     - to reinit that module, use "reload(that_module)"
     The entry point will reload this script, thus reinitializing and running it every time
 '''
-from atait_scripting_support import reload, notify, expose_kicad_python, requires_kicad_python
+from atait_scripting_support import reload, notify
 import sys
 import time
 
@@ -56,7 +56,6 @@ def hello_world():
 #### some tests of kicad-python
 
 # Verify autoreloading
-@requires_kicad_python(autoreload=True)
 def test_autoreload():
     from kicad.pcbnew.board import Board
     pcb = Board.from_editor()
@@ -75,7 +74,6 @@ class Board(object):
 # test_autoreload()
 
 # get a module already present and move it
-@requires_kicad_python
 def move_footprint():
     from kicad.pcbnew.board import Board
     pcb = Board.from_editor()

@@ -49,52 +49,6 @@ except ImportError:
     else:
         pcbnew = None
 
-
-def expose_kicad_python():
-    if pcbnew is None:
-        raise ImportError(
-            'kicad-python can only be used within the scope of pcbnew,'
-            'which is not available on command line'
-        )
-    try:
-        import kicad
-    except ImportError:
-        pass
-    else:
-        return
-    sys.path.insert(0, os.path.join(path_kicad_user_scripting, 'kicad-python'))
-    sys.path.insert(0, os.path.join(path_kicad_user_plugins, 'kicad-python'))
-    try:
-        import kicad
-    except ImportError:
-        raise ImportError(
-            'kicad-python not found. '
-            'Download from "https://github.com/KiCad/kicad-python" with\n'
-            'cd {}\ngit clone git@github.com:KiCad/kicad-python.git'.format(path_kicad_user_scripting)
-        )
-
-
-def requires_kicad_python(*possiblefunc, **kwauto):
-    autoreload = kwauto.get('autoreload', False)  # This no explicit kwargs style is required for python 2
-    if len(possiblefunc) == 0:
-        return lambda func: requires_kicad_python(func, autoreload=autoreload)
-    elif len(possiblefunc) == 1 and callable(possiblefunc[0]):
-        func = possiblefunc[0]
-        @wraps(func)
-        def wrapped(*args, **kwargs):
-            expose_kicad_python()
-            if autoreload:
-                from kicad.pcbnew import drawing, module, board, layer
-                reload(drawing)
-                reload(module)
-                reload(board)
-                reload(layer)
-            return func(*args, **kwargs)
-        return wrapped
-    else:
-        raise ValueError('Invalid number of arguments')
-
-
 # Messages
 def notify(*args):
     text = ' '.join(str(arg) for arg in args)
