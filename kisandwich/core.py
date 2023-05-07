@@ -252,6 +252,12 @@ def process_vias2(pcb, which_one='LOW', proc_opts=None):
                 pcb.add_circle(layer='B.Paste', **stencil_kwargs)
 
 
+def export_vrml(pcb, outfile=None):
+    if outfile is None:
+        outfile = pcb.filename.split('.')[0] + '.wrl'
+    print('write to', outfile)
+    pcbnew.VRML_WRITER().ExportVRML_File(outfile, 1.0, True, True, 'shapes3D', 0, 0)
+
 
 def process_all(pcb, which_one='LOW', proc_opts=None):
     ''' proc_opts is a dictionary with either functions or strings describing the steps to take '''
@@ -311,10 +317,12 @@ def base_to_default_boardfile(filepath, which_one='LOW', subdirectory=''):
 def sandwich_from_file(infile, which_one='LOW', outfile=None, proc_opts=None):
     ''' The CLI '''
     if outfile is None:
-        outfile = base_to_default_boardfile(infile, which_one)
+        outfile = base_to_default_boardfile(infile, which_one, subdirectory='kisandwich-out')
     proc_opts_full = proc_opts_default.copy()
     if proc_opts is not None:
         proc_opts_full.update(proc_opts)
     workingpcb = Board.load(infile)
     process_all(workingpcb, which_one, proc_opts_full)
     workingpcb.save(outfile)
+    outwrl = outfile.split('.')[0] + '.wrl'
+    # export_vrml(workingpcb)
