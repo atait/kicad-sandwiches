@@ -19,7 +19,7 @@ The next time you start pcbnew, you should see these icons in the menu bar.
 
 If not, try going to Preferences>"action plugins" to search for them in the list and check the enable boxes.
 
-## Usage example
+## Usage
 The "examples" directory walks through a full design flow. The main design file is called "sandwich-example.kicad_pcb". It is designed as a 4-layer board with surface mount components on front and back. The image "pcbnew-snapshot.png" shows what the program *thinks* you are designing.
 
 ![4layer](examples/pcbnew-snapshot.png)
@@ -29,25 +29,113 @@ The real thing will be stacked in the opposite order. F.Cu and B.Cu are used to 
 
 The reason for doing this is that blind vias make sense (except blind vias between In1 and In2). Components can be placed on F and B, but not In1 and In2. Most of the same DRC still applies, for example, a trace on F.Cu can pass over a buried via between B and In2.
 
-#### Making the sandwich
+**User.Eco1** makes cuts in the TOP board. Make sure cuts defined by Eco1 do not intersect footprints on Back. If it is a 2-board internal stack, put Eco1 openings around footprints on Front.
+
+**User.Eco2** makes cuts in the LOW board. Make sure cuts defined by Eco2 do not intersect footprints on Front. If it is a 2-board internal stack, put Eco2 openings around footprints on Back.
+
+**Margin *or* User.3** make cuts in the MID board if there is a 3-board stackup (i.e. 6 copper layers). In a 3-board stack (almost always internal), make sure there are slots in this layer for all footprints on front or back.
+
+#### Running the scripts
 Using the kisandwich plugin, this "board" is converted to two other files corresponding to the actual 2-layer boards: "kisandwich-out/sandwich-example-sandwich_\[LOW|TOP\].kicad_pcb". The plugin is activated with the ![sandwich](kisandwich/icons/sandwich-32.png) button, which gives a dialog with various options.
 
-#### The 3D model
-In the same directory, these are exported to VRML (.wrl) models. The models are assembled together in FreeCAD in the file "FreeCAD-out/stack-3dModel.FCStd". In FreeCAD, the lower board is translated down by one board thickness, and their appearances can be altered. Finally, a snapshot of the FreeCAD assembly is included in "FreeCAD-out/assembled-snapshot.png".
+There are also entry points available to external python environments. These work on board files instead of the GUI's board.
 
-## Todo
-1. Options for adding a bonding ring around the perimeter
-2. Surface mount bond pads
-3. Extend to 6-layer boards
-4. Experimentation on sizes of bond pads needed
-5. An actual build with tips and notes
+#### Bonding pads
+If you want a standard through via on one of your resulting boards, make this a *buried* via in the base design. A buried via between F.Cu/In1.Cu will get converted to a regular via on the LOW board. Buried vias between In1.Cu and In2.Cu make no sense! Those correspond to layers on the outside of the stackup.
 
-## Construction tips
-On the way...
+kisandwich will interpret through vias as bonding points. It will tent them (covered by solder mask) on the outer sides, and de-tent them on the insides so that a big copper pad is exposed. When you get the PCBs, you put solder paste on these pads and reflow. Having a hole is extremely useful so you can stick in a soldering iron in case your reflow doesn't yield 100%.
 
-I anticipate this will yield some information about bond pad design and a fair amount of monkeying with an oven. A good tip seems to be getting the pick-and-place to use lead-free solder, then using leaded solder for bonding because it has a lower melting point.
+Recommended bond pad parameters: Via diameter = 2 mm; Via hole = 1 mm
 
-What is the alignment tolerance? This will affect the size of bond pads.
+#### FreeCAD integration
+In the same directory, all the boards are exported to VRML (.wrl) models. 
+
+**Todo: is this automated yet? KiCad 7 changed some VRML entry points**
+
+**Todo: describe FreeCAD plugin installation here**
+
+The models are assembled together in FreeCAD in the file "FreeCAD-out/stack-3dModel.FCStd". In FreeCAD, the lower board is translated down by one board thickness, and their appearances can be altered. Finally, a snapshot of the FreeCAD assembly is included in "FreeCAD-out/assembled-snapshot.png".
+
+**Todo: describe the different ways FreeCAD can import**
+
+## Advanced features for 3-board stackups
+See `kisandwich/three_board.py` for full information about modified layer mappings.
+
+### 6-layer routing
+As before, In1.Cu will map to B.Cu of the LOW board. Similarly, the lowest internal routing layer will map to F.Cu of the TOP board; however, that lowest layer is now In4.Cu instead of In2.Cu. Now, In2.Cu and In3.Cu will map to the MID board's F.Cu and B.Cu.
+
+The vias get more complicated now. As before, a little buried via between F.Cu/In1.Cu will result in a normal through via on LOW. Likewise, buried B.Cu/In4.Cu -> through on TOP, and buried In2.Cu/In3.Cu -> through on MID.
+
+A through via will get turned into through vias on all boards for bonding - make sure they use the recommended parameters above. kisandwich will take care of tenting.
+
+What about buried vias In1.Cu/In2.Cu and In3.Cu/In4.Cu? These also get turned into bond pads. Make sure they use recommended diameter/drill parameters. The difference is that these bond pads are still buried, going only between LOW/MID or only between MID/HIGH.
+
+### Footprints defining cuts
+Any footprint whose *Value* field starts with "KISANDWICH-CUTTER" will have its graphic objects on Eco1, Eco2, Margin, User.3 interpreted as cuts, just as if they were drawn in the PCB file itself. This is very useful if you have some mechanical component stuck in the boards and need to move it around while keeping all cuts aligned. For example, a zero-profile screw point or an embedded speaker.
+
+### Footprints on MID
+Any footprint whose *Value* field starts with "KISANDWICH-MIDBOARD" will end up on the MID and removed from TOP and LOW. Front stays as Front, and Back as Back. I'm not sure when you would want to do this with an IC; maybe it is a sensor of some kind. Where this gets more useful is with modules with vector art that you want to expose through one of the Eco cuts.
+
+### Drawing on MID
+This requires a text editor. Open your .kicad_pcb file and add layers starting with "Mid." as shown below. The layer numbers don't matter because kicad-python will find them by name. Note, the exact format of this file might depend on version of kicad
+
+```
+(layers
+  (0 "F.Cu" signal)
+  (1 "In1.Cu" signal)
+  ...
+  (49 "F.Fab" user)
+  (60 "Mid.F.SilkS" user)
+  (61 "Mid.B.SilkS" user)
+  (62 "Mid.F.Mask" user)
+  (63 "Mid.B.Mask" user)
+)
+```
+
+### Stencil creation
+This does not work great for 2-board because both have components placed. With 3 boards, you want to use a stencil on both sides of MID, which likely does not have pre-placed physical components. There is a stencil option in the popup window, which is probably self explanatory for the most part. Even if you don't make a physical stencil, the stencil layout will point out places that bonds will go.
+
+
+## Construction methodology
+Holy shit, it works. I have so far made 2x 2-board designs, and about 5x 3-board designs. Full documentation of that process with pictures is on the way... TODO. A quick summary will have to do for now.
+
+### What you need
+- Crocodile clamps. These apply a lot more force than alligator clamps
+- Solder paste. Preferably a low-temperature eutetic alloy
+- Remote oven thermometer. It is best to use its air probe, but I think a meat probe is fine
+- Timer
+- Cooling rack, or anything to which you can attach the probe
+- Parchment paper
+- Soldering iron with a fine (<1 mm), conical tip
+- Continuity tester like the one on most multimeters
+
+### Procedure for attaching 2 boards
+No stencil here. Take your solder paste in a syringe, and put dabs directly on bond pads, one-by-one. Gently mate LOW with TOP, then use croc clamps to squeeze. The rest of the steps are same as below
+
+### Procedure for attaching 3 boards w/ stencil
+- Using the TOP stencil, apply paste to the MID board
+- Gently put the MID board on top of the TOP board
+- Using the LOW stencil, apply paste to the other side MID board, now facing up
+- Gently put the LOW board on that fresh layer of paste
+- Squeeze together using crocodile clamps, and make sure the alignment is good
+
+### Procedure for reflow bonding
+- Preheat your oven to ~400 F
+- Get the little card that came with your solder paste that has optimal reflow profile. Put it next to your oven
+- Arrange your boards with croc clamps on parchment paper on the cooling rack
+- Attach the thermometer probe so that it is close to the PCBs but not touching anything solid
+- Slide out an oven rack, and put the cooling rack (or whatever thing) on the oven rack
+- Do not return the oven rack. Let it warm up a bit. 60 seconds tends to work.
+- Slide in the oven rack. While watching temperature, let it get to the starting temp specified on the card
+- While closely watching timer and comparing to the card, *partially* close and open the oven door to follow the profile
+- For the "hit it" period, fully close the oven. Let it get *slightly* hotter for *slightly* longer than specified
+- Fully open the oven. As it cools, slowly slide out the oven rack until you reach the card's end temperature
+- Take the whole thing out and let it cool
+
+### Procedure for rework
+Yield is pretty good but less than 100%. You can use a continuity meter on the outside of the stackup to see what didn't connect. This does not work on buried bond pads, so you also have to rely on functional testing. LED not lighting up? It probably has something to do with the bond pad to that LED.
+
+Jam the soldering iron into the hole of the disconnected bond pads. This will not damage good bonds, so you could just do this on every bond. If there was not enough solder paste, you sometimes have to cut off a few millimeters of solder wire, stick that in the hole, then bring in the soldering iron.
 
 
 ## Bonus: One push
