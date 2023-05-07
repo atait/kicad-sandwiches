@@ -1,3 +1,0 @@
-(sym_lib_table
-    (lib (name archive)(type Legacy)(uri "${KIPRJMOD}/sandwich-example-archive.lib")(options "")(descr ""))
-)
