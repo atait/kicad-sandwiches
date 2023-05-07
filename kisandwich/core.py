@@ -300,8 +300,8 @@ def sandwich_from_gui(which_one='LOW', refresh=False, outfile=None, proc_opts=No
         if outfile is not None:
             livepcb.save(outfile)
     elif outfile is not None:
-        livepcb.save(outfile)
-        sandwich_from_file(outfile, which_one, outfile, proc_opts)
+        # livepcb.save(outfile)
+        sandwich_from_file(livepath, which_one, outfile, proc_opts)
 
 
 def base_to_default_boardfile(filepath, which_one='LOW', subdirectory=''):
