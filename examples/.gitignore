@@ -1,0 +1,9 @@
+*.pro
+fp-info-cache
+*-cache.lib
+*.zip
+~*.kicad_prl
+~*.kicad_pro
+*/kisandwich-out/*.kicad_prl
+*/kisandwich-out/*.kicad_pro
+_autosave*.kicad_pcb
