@@ -140,17 +140,19 @@ def process_tracks(pcb, which_one='LOW', proc_opts=None):
 
 
 def process_zones(pcb, which_one='LOW', proc_opts=None):
-    ''' Bug: does not work with multi-layer keepouts '''
     sandwich_type = proc_opts.sandwich_type
     remove_keepouts = proc_opts.zones.remove_keepouts
     for zone in pcb.zones:
-        zo_layer = map_copper[which_one, sandwich_type].get(zone.layer, zone.layer)
-        if zo_layer is None:
-            pcb.remove(zone)
-        else:
-            zone.layer = zo_layer
         if remove_keepouts and zone.is_keepout:
             pcb.remove(zone)
+            continue
+        zo_layers_from = zone.layerset.layer_names
+        zo_layers_to = [map_copper[which_one, sandwich_type].get(fro, fro) for fro in zo_layers_from]
+        zo_2 = [x for x in zo_layers_to if x is not None]
+        if len(zo_2) == 0:
+            pcb.remove(zone)
+            continue
+        zone.layerset = layer.LayerSet(zo_2, pcb)
 
 
 def process_drawings(pcb, which_one='LOW', proc_opts=None):
@@ -260,10 +262,19 @@ def process_vias2(pcb, which_one='LOW', proc_opts=None):
 
 
 def export_vrml(pcb, outfile=None):
+    ''' Can we batch this somehow? It only works in window right now '''
     if outfile is None:
         outfile = pcb.filename.split('.')[0] + '.wrl'
     print('write to', outfile)
-    pcbnew.VRML_WRITER().ExportVRML_File(outfile, 1.0, True, True, 'shapes3D', 0, 0)
+
+    settings = dict(aFullFileName=outfile, aMMtoWRMLunit=1.0, aExport3DFiles=True, aUseRelativePaths=True, a3D_Subdir='shapes3D', aXRef=0, aYRef=0)
+    # v6?
+    # pcbnew.VRML_WRITER().ExportVRML_File(outfile, 1.0, True, True, 'shapes3D', 0, 0)
+    # works on v7
+    # return pcbnew.ExportVRML(outfile, **settings)
+    project = pcb._obj.GetProject()
+    writer = pcbnew.EXPORTER_VRML(pcb._obj)
+    return writer.ExportVRML_File(project, '', **settings)
 
 
 def process_all(pcb, which_one='LOW', proc_opts=None):
@@ -325,5 +336,5 @@ def sandwich_from_file(infile, which_one='LOW', outfile=None, proc_opts=None):
     workingpcb = Board.load(infile)
     process_all(workingpcb, which_one, proc_opts_full)
     workingpcb.save(outfile)
-    outwrl = outfile.split('.')[0] + '.wrl'
+    # outwrl = outfile.split('.')[0] + '.wrl'
     # export_vrml(workingpcb)
