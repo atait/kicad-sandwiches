@@ -26,6 +26,9 @@ def select_files():
     sandwich_suffixes = ['LOW', 'MID', 'TOP']
     file_fmt = os.path.join(root_dir, sandwich_group + '_{}' + extension)
     files = [file_fmt.format(suffix) for suffix in sandwich_suffixes]
+    if not os.path.exists(files[1]):  # It is 2-board
+        sandwich_suffixes.pop(1)
+        files.pop(1)
     for file in files:
         if not os.path.exists(file):
             raise IOError('Did not find kisandwich file: ' + file)

@@ -58,6 +58,16 @@ The models are assembled together in FreeCAD in the file "FreeCAD-out/stack-3dMo
 
 **Todo: describe the different ways FreeCAD can import**
 
+#### DRC
+The overall design should pass DRC. This will catch things like wires too close, and it won't hit non-errors like F.Cu crossing a B.Cu/In2.Cu buried via. It might have strange hits on edge aspects, which is what the next step is for.
+
+All of the kisandwich-out boards should also pass DRC. This will catch things like inclusion of tracks within edge cuts. KiCad's routing assistant does not know which Eco layers to avoid. That means there are 4 DRCs to do; they are meant to help you, so suck it up and hunt down those errors.
+
+A broader point: both the combined design and kisandwich outputs should roughly make sense as PCBs. The outputs must be valid 2-layer PCBs. The combined design should be a valid 6-layer or 4-layer PCB design, just with some new features and some other features verboten. The whole process of kisandwiches is designed to make both perspectives sensible.
+
+#### Ctrl-Z
+It finally works now. This was revolutionary. You can preview TOP, Ctrl-Z, preview LOW, Ctrl-Z without modifying anything or creating temporary files. It is recommended that you close and reopen the file after previewing the sandwiches, just in case. As far as I know, Ctrl-Z works 100%, but just in case.
+
 ## Advanced features for 3-board stackups
 See `kisandwich/three_board.py` for full information about modified layer mappings.
 
