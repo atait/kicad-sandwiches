@@ -4,4 +4,5 @@ import atait_scripting_support
 
 from . import onepush
 from . import kisandwich
+from . import mousebite
 # from . import quick_reload
