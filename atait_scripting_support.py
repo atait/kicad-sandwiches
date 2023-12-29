@@ -30,6 +30,17 @@ path_kicad_user_scripting = os.path.dirname(path_kicad_user_plugins)
 if path_kicad_user_scripting not in sys.path:
     sys.path.append(path_kicad_user_scripting)
 
+try:
+    # These should run when in GUI to expose kicad-python
+    import initialize_kicad_python_plugin
+except ImportError:
+    pass
+
+try:
+    import kicad
+except ImportError:
+    raise ImportError('You need kicad-python on PYTHONPATH to use kisandwiches')
+
 # Expose pcbnew if not in application context
 try:
     import pcbnew
