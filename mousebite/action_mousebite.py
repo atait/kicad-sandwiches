@@ -58,7 +58,7 @@ class MouseBite(pcbnew.ActionPlugin):
 
     def Run(self):
         # The entry function of the plugin that is executed on user action
-        import mousebite_script
+        from . import mousebite_script
         reload(mousebite_script)
 
         # Quick run with defaults
