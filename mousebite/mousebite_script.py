@@ -7,30 +7,23 @@ from kicad.pcbnew.board import Board
 from kicad.pcbnew.drawing import Segment, Arc, Polygon, Rectangle
 from kicad.pcbnew.via import Via
 from kicad.point import Point
-from kicad import notify
+# from kicad import notify
+from atait_scripting_support import reload, notify
 from pcbnew import Refresh
-
-tab_width = 3  # mm
-fillet = 1
-pitch = 1.3
-drill = .8
-inset = 0.25
-
-
-pcb = Board.from_editor()
+from mousebite import objview
 
 is_vert = lambda seg: seg.start.x == seg.end.x
 is_horz = lambda seg: seg.start.y == seg.end.y
 
-def get_segments():
+def get_segments(board):
     ''' Called multiple times because we are changing the segments
         every time we manifest a new mousebite
     '''
     eco_dwgs = []
     edge_dwgs = []
-    for dwg in pcb.drawings:
+    for dwg in board.drawings:
         if not isinstance(dwg, Segment): continue
-        if dwg.layer == 'User.Eco1':
+        if dwg.layer == opts.slay:
             eco_dwgs.append(dwg)
         elif dwg.layer == 'Edge.Cuts':
             edge_dwgs.append(dwg)
@@ -79,7 +72,7 @@ def get_bite_pairs(eco_segments, edge_segments):
             eco.select()
             raise ValueError(
                 f'Got {len(matches)} of intersecting Edge.Cuts segments.\n'
-                'It must be exactly 2. See the selected User.Eco1 segment.'
+                'It must be exactly 2. See the selected {} segment.'.format(opts.slay)
             )
     return all_matches
 
@@ -97,13 +90,9 @@ def get_bite_pair(eco_segments, edge_segments):
             eco.select()
             raise ValueError(
                 f'Got {len(matches)} of intersecting Edge.Cuts segments.\n'
-                'It must be exactly 2. See the selected User.Eco1 segment.'
+                'It must be exactly 2. See the selected {} segment.'.format(opts.slay)
             )
     return None
-
-
-# bite_pairs_vert = get_bite_pairs(eco_vert, edge_horz)
-# bite_pairs_horz = get_bite_pairs(eco_horz, edge_vert)
 
 def sort_box(og_box, ix=0):
     ''' Sorts a 2x2 list of Points
@@ -114,7 +103,7 @@ def sort_box(og_box, ix=0):
     og_box[1].sort(key=lambda pt: pt[ix])
     og_box.sort(key=lambda ln: ln[0][1-ix])
 
-def do_drawing(eco, h1, h2, horizontal=False):
+def do_drawing(board, eco, h1, h2, horizontal=False):
     # XY indexing
     ix = 1 if horizontal else 0
     iy = 1 - ix
@@ -124,62 +113,79 @@ def do_drawing(eco, h1, h2, horizontal=False):
         latlon_point = lambda lat, lon: Point(lat, lon)
 
     for ln in [eco, h1, h2]:
-        pcb.remove(ln, permanent=False)
+        board.remove(ln, permanent=False)
 
     # Key anchor points oriented by latitude/longitude instead of X/Y
     box_corner = [[h1.start, h1.end], [h2.start, h2.end]]
     sort_box(box_corner, ix)
     longitudes = [h.start[iy] for h in (h1, h2)]  # y if vertical, x if not
-    latitudes = [eco.start[ix] + sgn * tab_width/2 for sgn in [-1, 1]]
+    latitudes = [eco.start[ix] + sgn * opts.tab_width/2 for sgn in [-1, 1]]
     box_bridge = [[latlon_point(lat, lon) for lat in latitudes] for lon in longitudes]
     sort_box(box_bridge, ix)
 
     # Place the fillets, bridge, and snipped original edge
-    dwg_kws = dict(width=h1.width, layer='Edge.Cuts', board=pcb)
+    dwg_kws = dict(width=h1.width, layer='Edge.Cuts', board=board)
     for iwe in range(2):
         for ins in range(2):
             sgn_we = (-1) ** iwe
             sgn_ns = (-1) ** ins
             # fillet
-            dr = latlon_point(-sgn_we * fillet, sgn_ns * fillet)
+            dr = latlon_point(-sgn_we * opts.fillet, sgn_ns * opts.fillet)
             center = box_bridge[ins][iwe] + dr
             angle = 90 * (ins - iwe * sgn_ns)
             if horizontal and ins == iwe:
                 angle += 180
-            arc = Arc(center, fillet, angle, angle + 90, **dwg_kws)
-            pcb.add(arc)
+            arc = Arc(center, opts.fillet, angle, angle + 90, **dwg_kws)
+            board.add(arc)
             # replacement clipped edge
             outward_end = arc.start if (ins == iwe ^ horizontal) else arc.end
             inward_end = arc.end if (ins == iwe ^ horizontal) else arc.start
-            pcb.add(Segment(outward_end, box_corner[ins][iwe], **dwg_kws))
+            board.add(Segment(outward_end, box_corner[ins][iwe], **dwg_kws))
             # bridge
             if ins == 0:
                 prev_end = inward_end
             else:
-                pcb.add(Segment(prev_end, inward_end, **dwg_kws))
+                board.add(Segment(prev_end, inward_end, **dwg_kws))
     # Vias
     lat0 = eco.start[ix]
-    nvias = int((tab_width + 2 * fillet) / pitch)
-    longitudes = [box_corner[0][0][iy] - inset, box_corner[1][0][iy] + inset]
+    nvias = int((opts.tab_width + 2 * opts.fillet) / opts.pitch)
+    longitudes = [box_corner[0][0][iy] - opts.inset, box_corner[1][0][iy] + opts.inset]
     for lon in longitudes:
         for ivia in range(-nvias+1, nvias):
-            point = latlon_point(lat0 + ivia * pitch, lon)
-            pcb.add(Via(
+            point = latlon_point(lat0 + ivia * opts.pitch, lon)
+            board.add(Via(
                 point,
                 layer_pair=['B.Cu', 'F.Cu'],
-                diameter=.1, drill=drill,
-                board=pcb)
+                diameter=.1, drill=opts.drill,
+                board=board)
             )
 
-for _ in range(100):
-    eco_vert, _, _, edge_horz = get_segments()
-    lines = get_bite_pair(eco_vert, edge_horz)
-    if lines is None: break
-    do_drawing(*lines, horizontal=False)
-for _ in range(100):
-    _, eco_horz, edge_vert, _ = get_segments()
-    lines = get_bite_pair(eco_horz, edge_vert)
-    if lines is None: break
-    do_drawing(*lines, horizontal=True)
+opts = objview(
+    slay = 'User.Eco1',
+    tab_width = 3,  # mm
+    pitch = 1.3,
+    fillet = 1,
+    drill = .8,
+    inset = 0.25,
+)
 
-Refresh()
+def main_gui(dialog_opts=None):
+    if dialog_opts is not None:
+        opts.update(dialog_opts)
+    pcb = Board.from_editor()
+
+    for _ in range(100):
+        eco_vert, _, _, edge_horz = get_segments(pcb)
+        lines = get_bite_pair(eco_vert, edge_horz)
+        if lines is None: break
+        do_drawing(pcb, *lines, horizontal=False)
+
+    for _ in range(100):
+        _, eco_horz, edge_vert, _ = get_segments(pcb)
+        lines = get_bite_pair(eco_horz, edge_vert)
+        if lines is None: break
+        do_drawing(pcb, *lines, horizontal=True)
+
+    Refresh()
+
+# main_gui()
