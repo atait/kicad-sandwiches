@@ -41,15 +41,15 @@ class MousebiteGUI ( wx.Dialog ):
 
         bSizer18 = wx.BoxSizer( wx.VERTICAL )
 
+        self.m_bitmap1 = wx.StaticBitmap( self, wx.ID_ANY, wx.NullBitmap, wx.Point( -1,-1 ), wx.Size( -1,100 ), 0 )
+        bSizer18.Add( self.m_bitmap1, 0, wx.ALIGN_CENTER_VERTICAL|wx.EXPAND, 5 )
+
         bSizer20 = wx.BoxSizer( wx.HORIZONTAL )
 
-        self.m_staticText23 = wx.StaticText( self, wx.ID_ANY, u"Creates mousebite tabs in the Edge.Cuts layer. Location is determined by segments in the Slicing Layer. Each cutter segment must intersect two Edge.Cuts segments. Currently, only horizontal/vertical segments are supported.\nPress <Enter> to Apply.\nFully compatible with Cmd-Z undo and Cmd-Y redo", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText23 = wx.StaticText( self, wx.ID_ANY, u"Creates mousebite tabs in the Edge.Cuts layer. Location is determined by segments in the Slicing Layer. Each cutter segment must intersect two Edge.Cuts segments. Currently, only horizontal/vertical segments are supported.\nPress <Enter> to Apply.\nFully compatible with Undo/Redo (Cmd-Z/Y)", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText23.Wrap( 300 )
 
-        bSizer20.Add( self.m_staticText23, 0, wx.ALL, 5 )
-
-        self.m_bitmap1 = wx.StaticBitmap( self, wx.ID_ANY, wx.NullBitmap, wx.DefaultPosition, wx.DefaultSize, 0 )
-        bSizer20.Add( self.m_bitmap1, 0, wx.ALL, 5 )
+        bSizer20.Add( self.m_staticText23, 3, wx.ALL, 5 )
 
 
         bSizer18.Add( bSizer20, 0, wx.EXPAND, 5 )

@@ -15,7 +15,7 @@ class MouseBiteDialog(MousebiteGUI):
     def __init__(self, parent):
         super(MouseBiteDialog, self).__init__(parent)
         self.m_bitmap1.SetBitmap(wx.Bitmap(
-            os.path.join(os.path.dirname(__file__), 'icons/photon-32.png'), wx.BITMAP_TYPE_ANY
+            os.path.join(os.path.dirname(__file__), 'icons/mouse-128.png'), wx.BITMAP_TYPE_ANY
         ))
         self.terminal_choiceOK.SetDefault()
 
@@ -54,7 +54,7 @@ class MouseBite(pcbnew.ActionPlugin):
         self.description = ("MouseBites on Eco1")
         self.show_toolbar_button = True
         self.icon_file_name = os.path.join(os.path.dirname(__file__),
-            "icons/photon-32.png")
+            "icons/mouse-32.png")
 
     def Run(self):
         # The entry function of the plugin that is executed on user action
