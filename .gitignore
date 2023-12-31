@@ -8,6 +8,7 @@ __pycache__
 
 # Backups
 *.kicad_pcb-bak
+*.kicad_pcb.lck
 *.sch-bak
 *.FCStd1
 
