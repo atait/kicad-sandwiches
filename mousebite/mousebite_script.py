@@ -15,18 +15,24 @@ from mousebite import objview
 is_vert = lambda seg: seg.start.x == seg.end.x
 is_horz = lambda seg: seg.start.y == seg.end.y
 
+
+def fracture_polygons(board):
+    cutters = [dwg for dwg in board.drawings if isinstance(dwg, Segment) and dwg.layer == opts.slay]
+    cuttees = [dwg for dwg in board.drawings if isinstance(dwg, Polygon) and dwg.layer == 'Edge.Cuts']
+    fractured = []
+    for poly in cuttees:
+        for cut in cutters:
+            is_crossing = poly.contains(cut.start) ^ poly.contains(cut.end)
+            if is_crossing and poly not in fractured:
+                poly.to_segments(replace=True)
+                fractured.append(poly)
+
 def get_segments(board):
     ''' Called multiple times because we are changing the segments
         every time we manifest a new mousebite
     '''
-    eco_dwgs = []
-    edge_dwgs = []
-    for dwg in board.drawings:
-        if not isinstance(dwg, Segment): continue
-        if dwg.layer == opts.slay:
-            eco_dwgs.append(dwg)
-        elif dwg.layer == 'Edge.Cuts':
-            edge_dwgs.append(dwg)
+    eco_dwgs = [dwg for dwg in board.drawings if isinstance(dwg, Segment) and dwg.layer == opts.slay]
+    edge_dwgs = [dwg for dwg in board.drawings if isinstance(dwg, Segment) and dwg.layer == 'Edge.Cuts']
     eco_vert = [eco for eco in eco_dwgs if is_vert(eco)]
     eco_horz = [eco for eco in eco_dwgs if is_horz(eco)]
     edge_vert = [edge for edge in edge_dwgs if is_vert(edge)]
@@ -148,10 +154,12 @@ def do_drawing(board, eco, h1, h2, horizontal=False):
                 board.add(Segment(prev_end, inward_end, **dwg_kws))
     # Vias
     lat0 = eco.start[ix]
-    nvias = int((opts.tab_width + 2 * opts.fillet) / opts.pitch)
+    nvias = (opts.tab_width + 2 * opts.fillet) / opts.pitch
+    niter = nvias / 2
+    niter = int(-1 * niter // 1 * -1)  # ceil function
     longitudes = [box_corner[0][0][iy] - opts.inset, box_corner[1][0][iy] + opts.inset]
     for lon in longitudes:
-        for ivia in range(-nvias+1, nvias):
+        for ivia in range(-niter+1, niter):
             point = latlon_point(lat0 + ivia * opts.pitch, lon)
             board.add(Via(
                 point,
@@ -169,10 +177,22 @@ opts = objview(
     inset = 0.25,
 )
 
+opts = objview(
+    slay = 'User.Eco2',
+    tab_width = 1.5,  # mm
+    pitch = .6,
+    fillet = .5,
+    drill = .4,
+    inset = 0.1,
+)
+
 def main_gui(dialog_opts=None):
     if dialog_opts is not None:
         opts.update(dialog_opts)
     pcb = Board.from_editor()
+
+    # if selectedonly
+    fracture_polygons(pcb)
 
     for _ in range(100):
         eco_vert, _, _, edge_horz = get_segments(pcb)

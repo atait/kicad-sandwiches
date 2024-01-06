@@ -4,7 +4,7 @@
 import wx
 import pcbnew
 import os, sys
-from atait_scripting_support import reload
+from atait_scripting_support import reload, notify
 
 from .gui_dialog import MousebiteGUI
 from . import objview
