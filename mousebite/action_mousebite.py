@@ -60,11 +60,13 @@ class MouseBite(pcbnew.ActionPlugin):
         # The entry function of the plugin that is executed on user action
         from . import mousebite_script
         reload(mousebite_script)
+
+        from .mousebite_script import Board
         pcb = Board.from_editor()
 
         # Quick run with defaults
         if False:
-            mousebite_script.main_gui(pcb)
+            mousebite_script.main(pcb)
             pcbnew.Refresh()
             return
 
@@ -74,5 +76,5 @@ class MouseBite(pcbnew.ActionPlugin):
         main_res = main_dialog.ShowModal()
         sel = main_dialog.get_user_selections()
         if main_res == wx.ID_OK:
-            mousebite_script.main_gui(pcb, sel)
+            mousebite_script.main(pcb, sel)
             pcbnew.Refresh()
