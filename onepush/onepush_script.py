@@ -199,7 +199,27 @@ def probing():
     # debug_list = [d for d in dir(obj) if 'T' in d]
     # debug = '\n'.join(debug_list)
     notify(debug)
-probing()
+# probing()
+
+pcb = Board.from_editor()
+y = 0
+length = 50
+widths = [.12, .24, .48, .96]
+r_contact = 5
+for w in widths:
+    pcb.add_track([(0, y), (length, y)], 'F.Cu', width=w)
+    for lay in ['F.Cu', 'F.Mask']:
+        for x in [0, length]:
+            pcb.add_circle((x, y), r_contact / 2, lay, r_contact)
+    from kicad.pcbnew.drawing import TextPCB
+    args = ((length/2, y - 2), 'width = {:.2f}mm'.format(w), 'F.SilkS')
+    pcb.add_text(*args)
+    # tt = TextPCB(*args); pcb.add(tt)
+    # pcb.add(TextPCB(*args))
+    # tt = TextPCB((length/2, y - 2), 'width = {:.2f}mm'.format(w), 'F.SilkS')
+    # pcb.add(tt)
+    y += 20
+pcbnew.Refresh()
 
 
 #### Reload main window

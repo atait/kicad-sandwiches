@@ -1,7 +1,5 @@
 import traceback
-# import sys, os
-# sys.path.append(os.path.dirname(__file__))
-from atait_scripting_support import notify
+from kicad.exceptions import notify
 
 class objview(dict):
     def __getattr__(self, attr):

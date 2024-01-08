@@ -7,14 +7,10 @@ from kicad.pcbnew.board import Board
 from kicad.pcbnew.drawing import Segment, Arc, Polygon, Rectangle
 from kicad.pcbnew.via import Via
 from kicad.point import Point
-# from kicad import notify
-from atait_scripting_support import reload, notify
+from kicad.exceptions import notify
 from pcbnew import Refresh
 from mousebite import objview
-
-is_vert = lambda seg: seg.start.x == seg.end.x
-is_horz = lambda seg: seg.start.y == seg.end.y
-
+import sys
 
 def fracture_polygons(board):
     cutters = [dwg for dwg in board.drawings if isinstance(dwg, Segment) and dwg.layer == opts.slay]
@@ -33,6 +29,8 @@ def get_segments(board):
     '''
     eco_dwgs = [dwg for dwg in board.drawings if isinstance(dwg, Segment) and dwg.layer == opts.slay]
     edge_dwgs = [dwg for dwg in board.drawings if isinstance(dwg, Segment) and dwg.layer == 'Edge.Cuts']
+    is_vert = lambda seg: seg.start.x == seg.end.x
+    is_horz = lambda seg: seg.start.y == seg.end.y
     eco_vert = [eco for eco in eco_dwgs if is_vert(eco)]
     eco_horz = [eco for eco in eco_dwgs if is_horz(eco)]
     edge_vert = [edge for edge in edge_dwgs if is_vert(edge)]
@@ -49,38 +47,6 @@ def intersect_perp(vert, horz, either=True):
     if (vert.start.y < y) ^ (vert.end.y > y):
         return False
     return True
-
-def converstion_query():
-    text = 'Converting a box/polygon into segments. Are you sure?'
-    try:
-        import wx
-    except ImportError:
-        print(text)
-    else:
-        dialog = wx.MessageDialog(None, text, 'kisandwich debug output', wx.OK)
-        sg = dialog.ShowModal()
-
-# notify(f'Found {len(eco_dwgs)} eco drawings')
-# notify('--Edges--\n', '\n'.join(str(isinstance(ee, Segment)) for ee in edge_dwgs))
-
-def get_bite_pairs(eco_segments, edge_segments):
-    all_matches = []
-    for eco in eco_segments:
-        matches = []
-        for ed in edge_segments:
-            if intersect_perp(eco, ed):
-                matches.append(ed)
-        if len(matches) == 2:
-            all_matches.append((eco, matches))
-        elif len(matches) == 0:
-            pass
-        else:
-            eco.select()
-            raise ValueError(
-                f'Got {len(matches)} of intersecting Edge.Cuts segments.\n'
-                'It must be exactly 2. See the selected {} segment.'.format(opts.slay)
-            )
-    return all_matches
 
 def get_bite_pair(eco_segments, edge_segments):
     for eco in eco_segments:
@@ -177,21 +143,10 @@ opts = objview(
     inset = 0.25,
 )
 
-opts = objview(
-    slay = 'User.Eco2',
-    tab_width = 1.5,  # mm
-    pitch = .6,
-    fillet = .5,
-    drill = .4,
-    inset = 0.1,
-)
-
-def main_gui(dialog_opts=None):
+def main(pcb, dialog_opts=None):
     if dialog_opts is not None:
         opts.update(dialog_opts)
-    pcb = Board.from_editor()
 
-    # if selectedonly
     fracture_polygons(pcb)
 
     for _ in range(100):
@@ -206,6 +161,8 @@ def main_gui(dialog_opts=None):
         if lines is None: break
         do_drawing(pcb, *lines, horizontal=True)
 
-    Refresh()
-
-# main_gui()
+if __name__ == '__main__':
+    pcb = Board.load(sys.argv[1])
+    newname = pcb.filename.split('.')[0] + '-proc.kicad_pcb'
+    main(pcb)
+    pcb.save(newname)

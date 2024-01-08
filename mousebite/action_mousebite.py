@@ -4,7 +4,7 @@
 import wx
 import pcbnew
 import os, sys
-from atait_scripting_support import reload, notify
+from kicad import reload
 
 from .gui_dialog import MousebiteGUI
 from . import objview
@@ -60,10 +60,12 @@ class MouseBite(pcbnew.ActionPlugin):
         # The entry function of the plugin that is executed on user action
         from . import mousebite_script
         reload(mousebite_script)
+        pcb = Board.from_editor()
 
         # Quick run with defaults
         if False:
-            mousebite_script.main_gui()
+            mousebite_script.main_gui(pcb)
+            pcbnew.Refresh()
             return
 
         # show dialog
@@ -72,4 +74,5 @@ class MouseBite(pcbnew.ActionPlugin):
         main_res = main_dialog.ShowModal()
         sel = main_dialog.get_user_selections()
         if main_res == wx.ID_OK:
-            mousebite_script.main_gui(sel)
+            mousebite_script.main_gui(pcb, sel)
+            pcbnew.Refresh()
