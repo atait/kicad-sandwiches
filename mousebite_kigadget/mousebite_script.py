@@ -9,7 +9,7 @@ from kicad.pcbnew.via import Via
 from kicad.point import Point
 from kicad.exceptions import notify
 from pcbnew import Refresh
-from mousebite import objview
+from mousebite_kigadget import objview
 import sys
 
 def fracture_polygons(board):
