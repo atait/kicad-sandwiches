@@ -1,9 +1,9 @@
 import sys, os
 sys.path.append(os.path.dirname(__file__))
-import atait_scripting_support
+import expose_kigadgets_plugin
 
 from . import onepush
+from . import mousebite_kigadget
 from . import kisandwich
-from . import mousebite
-from . import fillet
+# from . import fillet
 # from . import quick_reload

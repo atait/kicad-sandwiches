@@ -1,13 +1,12 @@
 ''' Mousebites using the Eco1 layer.
-    An example of an action plugin simplified by kicad-python (200 lines)
+    An example of an action plugin simplified by kigadgets (<200 lines)
     Note: this gives plated vias; NPTH are preferred
     - You can place NPTH Footprints instead of Vias
 '''
-from kicad.pcbnew.board import Board
-from kicad.pcbnew.drawing import Segment, Arc, Polygon, Rectangle
-from kicad.pcbnew.via import Via
-from kicad.point import Point
-from kicad.exceptions import notify
+from kigadgets.board import Board
+from kigadgets.drawing import Segment, Arc, Polygon, Rectangle
+from kigadgets.via import Via
+from kigadgets import Point, notify
 from pcbnew import Refresh
 from mousebite_kigadget import objview
 import sys
@@ -130,7 +129,7 @@ def do_drawing(board, eco, h1, h2, horizontal=False):
             board.add(Via(
                 point,
                 layer_pair=['B.Cu', 'F.Cu'],
-                diameter=.1, drill=opts.drill,
+                size=.1, drill=opts.drill,
                 board=board)
             )
 

@@ -1,5 +1,5 @@
+import sys, os
 import traceback
-from atait_scripting_support import reload, notify
 
 
 class objview(dict):
@@ -14,6 +14,7 @@ class objview(dict):
 
 try:
     # expose_kicad_python()
+    from kigadgets import reload
     from kisandwich import action_plugin, core, gui_dialog
     reload(action_plugin)
     reload(core)
@@ -24,6 +25,7 @@ try:
     from .core import *
 except Exception as e:
     try:
+        from kigadgets import notify
         notify('Kisandwich import failed\n' + traceback.format_exc())
     except Exception:
         pass

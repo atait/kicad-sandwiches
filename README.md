@@ -87,7 +87,7 @@ Any footprint whose *Value* field starts with "KISANDWICH-CUTTER" will have its 
 Any footprint whose *Value* field starts with "KISANDWICH-MIDBOARD" will end up on the MID and removed from TOP and LOW. Front stays as Front, and Back as Back. I'm not sure when you would want to do this with an IC; maybe it is a sensor of some kind. Where this gets more useful is with modules with vector art that you want to expose through one of the Eco cuts.
 
 ### Drawing on MID
-This requires a text editor. Open your .kicad_pcb file and add layers starting with "Mid." as shown below. The layer numbers don't matter because kicad-python will find them by name. Note, the exact format of this file might depend on version of kicad
+This requires a text editor. Open your .kicad_pcb file and add layers starting with "Mid." as shown below. The layer numbers don't matter because kigadgets will find them by name. Note, the exact format of this file might depend on version of kicad
 
 ```
 (layers

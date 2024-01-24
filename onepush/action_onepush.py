@@ -1,7 +1,7 @@
 ''' Entry point for onepush_script.py
     On OSX, you can hotkey the corresponding menu item: "One Push"
 '''
-from atait_scripting_support import reload
+from kigadgets import reload
 import pcbnew
 import os, sys
 

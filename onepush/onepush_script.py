@@ -31,11 +31,11 @@
     - to reinit that module, use "reload(that_module)"
     The entry point will reload this script, thus reinitializing and running it every time
 '''
-from atait_scripting_support import reload, notify
+from kigadgets import reload, notify
 import sys
 import time
 import pcbnew
-from kicad.pcbnew.board import Board
+from kigadgets.board import Board
 # pcb = Board.from_editor()
 
 def default():
@@ -130,7 +130,7 @@ def crawl_API(base=None, regex='Get', levels=2):
     return filtered
 # notify('\n'.join(crawl_pcbnew_API(regex='SHAPE')))
 
-#### some tests of kicad-python
+#### some tests of kigadgets
 
 # Verify autoreloading
 def test_autoreload():
@@ -150,7 +150,7 @@ class Board(object):
 
 # get a module already present and move it
 def move_footprint():
-    from kicad.pcbnew.board import Board
+    from kigadgets.board import Board
     pcb = Board.from_editor()
     mod = pcb.moduleByRef('D1')
     mod.position = (50, 30)
@@ -174,11 +174,9 @@ edge = [ul,
         (ul[0]+pcb_size[0], ul[1]),
         ul]
 pcb.add_polyline(edge, layer='Edge.Cuts')
-'''
 
 def probing():
-    from kicad import units
-    from kicad.pcbnew.drawing import ShapeType
+    from kigadgets.drawing import ShapeType
     pcb = Board.from_editor()
     debug = ''
     sel = list(pcb.selected_items)
@@ -200,27 +198,7 @@ def probing():
     # debug = '\n'.join(debug_list)
     notify(debug)
 # probing()
-
-pcb = Board.from_editor()
-y = 0
-length = 50
-widths = [.12, .24, .48, .96]
-r_contact = 5
-for w in widths:
-    pcb.add_track([(0, y), (length, y)], 'F.Cu', width=w)
-    for lay in ['F.Cu', 'F.Mask']:
-        for x in [0, length]:
-            pcb.add_circle((x, y), r_contact / 2, lay, r_contact)
-    from kicad.pcbnew.drawing import TextPCB
-    args = ((length/2, y - 2), 'width = {:.2f}mm'.format(w), 'F.SilkS')
-    pcb.add_text(*args)
-    # tt = TextPCB(*args); pcb.add(tt)
-    # pcb.add(TextPCB(*args))
-    # tt = TextPCB((length/2, y - 2), 'width = {:.2f}mm'.format(w), 'F.SilkS')
-    # pcb.add(tt)
-    y += 20
-pcbnew.Refresh()
-
+'''
 
 #### Reload main window
 pcbnew.Refresh()

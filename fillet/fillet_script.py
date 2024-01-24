@@ -3,11 +3,11 @@
     Note: this gives plated vias; NPTH are preferred
     - You can place NPTH Footprints instead of Vias
 '''
-from kicad.pcbnew.board import Board
-from kicad.pcbnew.drawing import Segment, Arc, Polygon, Rectangle
-from kicad.pcbnew.via import Via
-from kicad.point import Point
-from kicad import notify
+from kigadgets.board import Board
+from kigadgets.drawing import Segment, Arc, Polygon, Rectangle
+from kigadgets.via import Via
+from kigadgets.point import Point
+from kigadgets import notify
 from pcbnew import Refresh
 from collections import defaultdict
 import cmath

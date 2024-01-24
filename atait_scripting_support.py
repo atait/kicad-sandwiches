@@ -32,14 +32,14 @@ if path_kicad_user_scripting not in sys.path:
 
 try:
     # These should run when in GUI to expose kicad-python
-    import initialize_kicad_python_plugin
+    import expose_kigadgets_plugin
 except ImportError:
     pass
 
 try:
-    import kicad
+    import kigadgets
 except ImportError:
-    raise ImportError('You need kicad-python on PYTHONPATH to use kisandwiches')
+    raise ImportError('You need kigadgets on PYTHONPATH to use kisandwiches')
 
 # Expose pcbnew if not in application context
 try:

@@ -1,16 +1,13 @@
 ''' Sandwich a.k.a. Oreo board logic
 '''
-from atait_scripting_support import reload, notify
 import os
-
 import pcbnew
-import kicad
-from kicad.pcbnew import drawing, module, board, layer
-from kicad.pcbnew.layer import Layer
-from kicad.pcbnew.board import Board
+from kigadgets import reload, notify
+from kigadgets import drawing, module, board, layer
+from kigadgets.board import Board
 from kisandwich import objview
 # Reload any modules that this project depends on
-# reload(kicad)
+# reload(kigadgets)
 # reload(drawing)
 # reload(module)
 # reload(board)
@@ -190,7 +187,7 @@ def process_modules2(pcb, which_one='LOW', proc_opts=None):
         if (
             (which_one == 'LOW')
             ^ (proc_opts.sandwich_type == 'inside')
-            ^ (mod.layer == Layer.Back)
+            ^ (mod.layer == 'B.Cu')
             or (which_one == 'STENCIL')
         ):
             pcb.remove(mod)
@@ -232,25 +229,25 @@ def process_vias2(pcb, which_one='LOW', proc_opts=None):
         # Make open bond pads
         elif via.is_through:
             if diameter_override is not None:
-                via.diameter = diameter_override
+                via.size = diameter_override
             elif diameter_minimum is not None:
-                via.diameter = max(via.diameter, diameter_minimum)
+                via.size = max(via.size, diameter_minimum)
             if drill_override is not None:
                 via.drill = drill_override
             elif drill_minimum is not None:
                 via.drill = max(via.drill, drill_minimum)
 
-            opening_radius = coverage_ratio * via.diameter / 4
+            opening_radius = coverage_ratio * via.size / 4
             opening_width = 2 * opening_radius
             opening_kwargs = dict(center=via.center, radius=opening_radius, width=opening_width)
             mask_side = 'F' if (which_one == 'LOW') else 'B'
             pcb.add_circle(layer=mask_side+'.Mask', **opening_kwargs)
             if shrink_outside:
-                via.diameter = via.drill * 1.05
+                via.size = via.drill * 1.05
                 start = via.center - (0.001, 0)
                 end = via.center + (0.001, 0)
                 pad = pcb.add_track_segment(start=start, end=end, layer=mask_side+'.Cu', width=2*opening_radius+opening_width)
-                pad.netName = via.netName
+                pad.net_name = via.net_name
                 # pcb.add_circle(layer=mask_side+'.Cu', **opening_kwargs)
             if which_one == 'STENCIL':
                 x = proc_opts.stencil.get('fill_ratio', 0.6)

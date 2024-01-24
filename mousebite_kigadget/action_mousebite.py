@@ -4,7 +4,7 @@
 import wx
 import pcbnew
 import os, sys
-from kicad import reload
+from kigadgets import reload
 
 from .gui_dialog import MousebiteGUI
 from . import objview

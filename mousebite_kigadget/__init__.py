@@ -1,5 +1,7 @@
 import traceback
-from kicad.exceptions import notify
+
+import sys, os
+sys.path.append(os.path.dirname(__file__))
 
 class objview(dict):
     def __getattr__(self, attr):
@@ -16,6 +18,7 @@ try:
     MouseBite().register() # Instantiate and register to Pcbnew
 except Exception as e:
     try:
+        from kigadgets import notify
         notify('Mousebite import failed\n' + traceback.format_exc())
     except Exception:
         pass

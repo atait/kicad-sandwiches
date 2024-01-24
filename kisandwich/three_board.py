@@ -1,11 +1,8 @@
-from atait_scripting_support import reload, notify
 import os
-
 import pcbnew
-import kicad
-from kicad.pcbnew import drawing, module, board, layer
-from kicad.pcbnew.layer import Layer
-from kicad.pcbnew.board import Board
+from kigadgets import reload, notify
+from kigadgets import drawing, module, board, layer
+from kigadgets.board import Board
 from kisandwich import objview
 import kisandwich.core as core
 
@@ -157,7 +154,7 @@ def process_vias3(pcb, which_one='LOW', proc_opts=None):
                     start = via.center - (0.001, 0)
                     end = via.center + (0.001, 0)
                     pad = pcb.add_track_segment(start=start, end=end, layer=mask_side+'.Cu', width=2*opening_radius+opening_width)
-                    pad.netName = via.netName
+                    pad.net_name = via.net_name
                     # pcb.add_circle(layer=mask_side + '.Cu', **opening_kwargs)
 
             if which_one == 'STENCIL' or which_one == 'MID' and proc_opts.enable.stencil:
@@ -214,7 +211,7 @@ def process_modules3(pcb, which_one='LOW', proc_opts=None):
     for mod in pcb.modules:
         # cutter modules. Keep cutters in the stencil
         if mod.value.startswith('KISANDWICH-CUTTER'):
-            flipped = (mod.layer == Layer.Back)
+            flipped = (mod.layer == 'B.Cu')
             transmute_module_cuts(mod, which_one, flipped, proc_opts=proc_opts)
             continue  # never delete this module
         # midboard modules that can be on either layer
@@ -230,7 +227,7 @@ def process_modules3(pcb, which_one='LOW', proc_opts=None):
             if (
                 (which_one == 'LOW')
                 ^ (proc_opts.sandwich_type == 'inside')
-                ^ (mod.layer == Layer.Back)
+                ^ (mod.layer == 'B.Cu')
                 or (which_one == 'STENCIL')
             ):
                 pcb.remove(mod)
