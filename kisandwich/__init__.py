@@ -1,6 +1,4 @@
-import sys, os
 import traceback
-
 
 class objview(dict):
     def __getattr__(self, attr):
@@ -20,9 +18,9 @@ try:
     kireload(core)
     kireload(gui_dialog)
 
-    from .action_plugin import Kisandwich # Note the relative import!
+    from kisandwich.action_plugin import Kisandwich # Note the relative import!
     Kisandwich().register()  # Instantiate and register to Pcbnew
-    from .core import *
+    from kisandwich.core import *
 except Exception as e:
     try:
         from kigadgets import notify

@@ -4,10 +4,9 @@ import pcbnew
 import os, sys
 from kigadgets import notify, kireload
 
-from . import core
-from .core import sandwich_from_gui, process_all, base_to_default_boardfile, objview, proc_opts_default
-from . import gui_dialog
-from .gui_dialog import KisandwichGUI
+from kisandwich import core, gui_dialog
+from kisandwich.core import sandwich_from_gui, process_all, base_to_default_boardfile, objview, proc_opts_default
+from kisandwich.gui_dialog import KisandwichGUI
 
 
 class KisandwichDialog(KisandwichGUI):
