@@ -14,13 +14,12 @@ import sys
 def fracture_polygons(board):
     cutters = [dwg for dwg in board.drawings if isinstance(dwg, Segment) and dwg.layer == opts.slay]
     cuttees = [dwg for dwg in board.drawings if isinstance(dwg, Polygon) and dwg.layer == 'Edge.Cuts']
-    fractured = []
     for poly in cuttees:
         for cut in cutters:
             is_crossing = poly.contains(cut.start) ^ poly.contains(cut.end)
-            if is_crossing and poly not in fractured:
+            if is_crossing:
                 poly.to_segments(replace=True)
-                fractured.append(poly)
+                break
 
 def get_segments(board):
     ''' Called multiple times because we are changing the segments
@@ -59,6 +58,9 @@ def get_bite_pair(eco_segments, edge_segments):
             pass
         else:
             eco.select()
+            _ = [match.select() for match in matches]
+            if len(matches) == 1:
+                matches[0].select()
             raise ValueError(
                 f'Got {len(matches)} of intersecting Edge.Cuts segments.\n'
                 'It must be exactly 2. See the selected {} segment.'.format(opts.slay)
@@ -148,20 +150,32 @@ def main(pcb, dialog_opts=None):
 
     fracture_polygons(pcb)
 
-    for _ in range(100):
+    for _ in range(1000):
         eco_vert, _, _, edge_horz = get_segments(pcb)
         lines = get_bite_pair(eco_vert, edge_horz)
         if lines is None: break
         do_drawing(pcb, *lines, horizontal=False)
 
-    for _ in range(100):
+    for _ in range(1000):
         _, eco_horz, edge_vert, _ = get_segments(pcb)
         lines = get_bite_pair(eco_horz, edge_vert)
         if lines is None: break
         do_drawing(pcb, *lines, horizontal=True)
 
 if __name__ == '__main__':
-    pcb = Board.load(sys.argv[1])
+    import argparse
+
+    parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
+        description='Mousebite script based on kigadgets. You are looking at the CLI. An action plugin is also available'
+    )
+    parser.add_argument('-s', '--slay', type=str, default='User.Eco1', help='Layer with segments that cut across board edges')
+    parser.add_argument('input', type=str, help='Input pcb (.kicad_pcb)')
+    args = parser.parse_args()
+    # parser.add_argument('kicad_config_path', type=str)
+    # parser.add_argument('-n', '--dry-run', action='store_true')
+
+    pcb = Board.load(args.input)
     newname = pcb.filename.split('.')[0] + '-proc.kicad_pcb'
+    opts.slay = args.slay
     main(pcb)
     pcb.save(newname)
