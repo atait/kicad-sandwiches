@@ -2,7 +2,7 @@
 import wx
 import pcbnew
 import os, sys
-from kigadgets import notify, reload
+from kigadgets import notify, kireload
 
 from . import core
 from .core import sandwich_from_gui, process_all, base_to_default_boardfile, objview, proc_opts_default
@@ -205,7 +205,7 @@ class Kisandwich(pcbnew.ActionPlugin):
 
     def Run(self):
         import kisandwich.core
-        reload(kisandwich.core)
+        kireload(kisandwich.core)
 
         # load board
         livepcb = pcbnew.GetBoard()

@@ -2,11 +2,11 @@
 '''
 import os
 import pcbnew
-from kigadgets import reload, notify
-from kigadgets import drawing, module, board, layer
 from kigadgets.board import Board
+from kigadgets.layer import LayerSet
 from kisandwich import objview
 # Reload any modules that this project depends on
+# from kigadgets import drawing, module, board, layer
 # reload(kigadgets)
 # reload(drawing)
 # reload(module)
@@ -149,7 +149,7 @@ def process_zones(pcb, which_one='LOW', proc_opts=None):
         if len(zo_2) == 0:
             pcb.remove(zone)
             continue
-        zone.layerset = layer.LayerSet(zo_2, pcb)
+        zone.layerset = LayerSet(zo_2, pcb)
 
 
 def process_drawings(pcb, which_one='LOW', proc_opts=None):

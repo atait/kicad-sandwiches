@@ -2,7 +2,7 @@ import sys, os
 import traceback
 
 sys.path.append(os.path.dirname(__file__))
-from atait_scripting_support import notify
+from kigadgets import notify
 try:
     from .action_onepush import OnePush
     OnePush().register() # Instantiate and register to Pcbnew

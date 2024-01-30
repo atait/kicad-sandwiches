@@ -14,11 +14,11 @@ class objview(dict):
 
 try:
     # expose_kicad_python()
-    from kigadgets import reload
+    from kigadgets import kireload
     from kisandwich import action_plugin, core, gui_dialog
-    reload(action_plugin)
-    reload(core)
-    reload(gui_dialog)
+    kireload(action_plugin)
+    kireload(core)
+    kireload(gui_dialog)
 
     from .action_plugin import Kisandwich # Note the relative import!
     Kisandwich().register()  # Instantiate and register to Pcbnew

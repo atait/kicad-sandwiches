@@ -1,7 +1,5 @@
 import os
 import pcbnew
-from kigadgets import reload, notify
-from kigadgets import drawing, module, board, layer
 from kigadgets.board import Board
 from kisandwich import objview
 import kisandwich.core as core

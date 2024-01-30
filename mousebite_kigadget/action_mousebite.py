@@ -4,10 +4,10 @@
 import wx
 import pcbnew
 import os, sys
-from kigadgets import reload
+from kigadgets import kireload
 
-from .gui_dialog import MousebiteGUI
-from . import objview
+from mousebite_kigadget.gui_dialog import MousebiteGUI
+from mousebite_kigadget import objview
 
 class MouseBiteDialog(MousebiteGUI):
     _previous_selections = None
@@ -59,7 +59,7 @@ class MouseBite(pcbnew.ActionPlugin):
     def Run(self):
         # The entry function of the plugin that is executed on user action
         from . import mousebite_script
-        reload(mousebite_script)
+        kireload(mousebite_script)
 
         from .mousebite_script import Board
         pcb = Board.from_editor()

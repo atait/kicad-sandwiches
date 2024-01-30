@@ -1,7 +1,7 @@
 ''' Entry point for onepush_script.py
     On OSX, you can hotkey the corresponding menu item: "One Push"
 '''
-from kigadgets import reload
+from kigadgets import kireload
 import pcbnew
 import os, sys
 
@@ -18,5 +18,5 @@ class OnePush(pcbnew.ActionPlugin):
     def Run(self):
         # The entry function of the plugin that is executed on user action
         import onepush_script
-        reload(onepush_script)
+        kireload(onepush_script)
 

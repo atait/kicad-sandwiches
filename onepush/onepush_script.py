@@ -31,7 +31,7 @@
     - to reinit that module, use "reload(that_module)"
     The entry point will reload this script, thus reinitializing and running it every time
 '''
-from kigadgets import reload, notify
+from kigadgets import kireload, notify
 import sys
 import time
 import pcbnew
