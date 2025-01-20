@@ -192,6 +192,12 @@ def process_drawings(pcb, which_one='LOW', proc_opts=None):
 
 def process_modules2(pcb, which_one='LOW', proc_opts=None):
     for mod in pcb.modules:
+        # cutter modules. Keep cutters in the stencil
+        if mod.value.startswith('KISANDWICH-CUTTER'):
+            from kisandwich.three_board import transmute_module_cuts
+            flipped = (mod.layer == 'B.Cu')
+            transmute_module_cuts(mod, which_one, flipped, proc_opts=proc_opts)
+            continue  # never delete this module
         if (
             (which_one == 'LOW')
             ^ (proc_opts.sandwich_type == 'inside')
