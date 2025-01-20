@@ -12,14 +12,16 @@ class objview(dict):
 
 try:
     # expose_kicad_python()
-    from kigadgets import kireload
-    from kisandwich import action_plugin, core, gui_dialog
-    kireload(action_plugin)
+    from kigadgets.util import kireload, in_GUI
+    from kisandwich import core
     kireload(core)
-    kireload(gui_dialog)
+    if in_GUI():
+        from kisandwich import action_plugin, gui_dialog
+        kireload(action_plugin)
+        kireload(gui_dialog)
 
-    from kisandwich.action_plugin import Kisandwich # Note the relative import!
-    Kisandwich().register()  # Instantiate and register to Pcbnew
+        from kisandwich.action_plugin import Kisandwich # Note the relative import!
+        Kisandwich().register()  # Instantiate and register to Pcbnew
     from kisandwich.core import *
 except Exception as e:
     try:
