@@ -190,7 +190,7 @@ def transmute_module_cuts(mod, which_one='LOW', flipped=False, proc_opts=None):
     if flipped:
         which_one_edges = {'LOW': 'TOP', 'TOP': 'LOW', 'MID': 'MID'}[which_one]
     to_remove = set()
-    for dw in mod.graphicalItems:
+    for dw in mod.graphical_items:
         dw_layer = core.map_edges[which_one_edges].get(dw.layer, dw.layer)
         dw_layer = map_copper3[which_one, proc_opts.sandwich_type].get(dw_layer, dw_layer)
         dw_layer = core.map_drawings[which_one].get(dw_layer, dw_layer)

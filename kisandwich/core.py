@@ -143,7 +143,7 @@ def process_zones(pcb, which_one='LOW', proc_opts=None):
         if remove_keepouts and zone.is_keepout:
             pcb.remove(zone)
             continue
-        zo_layers_from = zone.layerset.layer_names
+        zo_layers_from = zone.layerset.layers
         zo_layers_to = [map_copper[which_one, sandwich_type].get(fro, fro) for fro in zo_layers_from]
         zo_2 = [x for x in zo_layers_to if x is not None]
         if len(zo_2) == 0:
@@ -262,7 +262,7 @@ def export_vrml(pcb, outfile=None):
     ''' Can we batch this somehow? It only works in window right now '''
     if outfile is None:
         outfile = pcb.filename.split('.')[0] + '.wrl'
-    print('write to', outfile)
+    # print('write to', outfile)
 
     settings = dict(aFullFileName=outfile, aMMtoWRMLunit=1.0, aExport3DFiles=True, aUseRelativePaths=True, a3D_Subdir='shapes3D', aXRef=0, aYRef=0)
     # v6?
@@ -333,5 +333,9 @@ def sandwich_from_file(infile, which_one='LOW', outfile=None, proc_opts=None):
     workingpcb = Board.load(infile)
     process_all(workingpcb, which_one, proc_opts_full)
     workingpcb.save(outfile)
-    # outwrl = outfile.split('.')[0] + '.wrl'
-    # export_vrml(workingpcb)
+    try:
+        outvrml = os.path.splitext(outfile)[0] + '.wrl'
+        # outwrl = outfile.split('.')[0] + '.wrl'
+        export_vrml(workingpcb, outvrml)
+    except Exception:
+        pass
