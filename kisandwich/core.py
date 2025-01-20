@@ -16,13 +16,17 @@ from kisandwich import objview
 map_edges = objview(
     TOP={
         'User.Eco1': 'Edge.Cuts',
+        'Eco1.User': 'Edge.Cuts',
         'User.Eco2': None,
+        'Eco2.User': None,
         'Margin': None,
         'User.3': None,
     },
     LOW={
         'User.Eco2': 'Edge.Cuts',
+        'Eco2.User': 'Edge.Cuts',
         'User.Eco1': None,
+        'Eco1.User': None,
         'Margin': None,
         'User.3': None,
     },
@@ -30,13 +34,17 @@ map_edges = objview(
         'Margin': 'Edge.Cuts',
         'User.3': 'Edge.Cuts',
         'User.Eco1': None,
+        'Eco1.User': None,
         'User.Eco2': None,
+        'Eco2.User': None,
     },
     STENCIL={
         'Margin': None,
         'User.3': None,
         'User.Eco1': None,
+        'Eco1.User': None,
         'User.Eco2': None,
+        'Eco2.User': None,
         'Edge.Cuts': None,
     }
 )
