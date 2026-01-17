@@ -4,7 +4,7 @@ import os
 import pcbnew
 from kigadgets.board import Board
 from kigadgets.layer import LayerSet
-from kisandwich import objview
+
 # Reload any modules that this project depends on
 # from kigadgets import drawing, module, board, layer
 # reload(kigadgets)
@@ -12,6 +12,15 @@ from kisandwich import objview
 # reload(module)
 # reload(board)
 
+class objview(dict):
+    def __getattr__(self, attr):
+        return self.__getitem__(attr)
+
+    def __setattr__(self, attr, val):
+        self.__setitem__(attr, val)
+
+    def copy(self):
+        return objview(super().copy())
 
 map_edges = objview(
     TOP={

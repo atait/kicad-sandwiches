@@ -26,8 +26,6 @@ try:
 except Exception as e:
     try:
         from kigadgets import notify
-        notify('Kisandwich import failed\n' + traceback.format_exc())
+        notify('Kisandwich registration failed\n' + traceback.format_exc())
     except Exception:
         pass
-
-
