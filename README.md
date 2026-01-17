@@ -25,7 +25,7 @@ The "examples" directory walks through a full design flow. The main design file 
 ![4layer](examples/pcbnew-snapshot.png)
 
 #### Actual layer meanings
-The real thing will be stacked in the opposite order. F.Cu and B.Cu are used to represent the layers on the inside of the sandwich, while In1.Cu and In2.Cu represent what will become the outside of the sandwich. F and B will bond to one another with solder. 
+The real thing will be stacked in the opposite order. F.Cu and B.Cu are used to represent the layers on the inside of the sandwich, while In1.Cu and In2.Cu represent what will become the outside of the sandwich. F and B will bond to one another with solder.
 
 The reason for doing this is that blind vias make sense (except blind vias between In1 and In2). Components can be placed on F and B, but not In1 and In2. Most of the same DRC still applies, for example, a trace on F.Cu can pass over a buried via between B and In2.
 
@@ -48,7 +48,7 @@ kisandwich will interpret through vias as bonding points. It will tent them (cov
 Recommended bond pad parameters: Via diameter = 2 mm; Via hole = 1 mm
 
 #### FreeCAD integration
-In the same directory, all the boards are exported to VRML (.wrl) models. 
+In the same directory, all the boards are exported to VRML (.wrl) models.
 
 **Todo: is this automated yet? KiCad 7 changed some VRML entry points**
 
@@ -146,7 +146,3 @@ No stencil here. Take your solder paste in a syringe, and put dabs directly on b
 Yield is pretty good but less than 100%. You can use a continuity meter on the outside of the stackup to see what didn't connect. This does not work on buried bond pads, so you also have to rely on functional testing. LED not lighting up? It probably has something to do with the bond pad to that LED.
 
 Jam the soldering iron into the hole of the disconnected bond pads. This will not damage good bonds, so you could just do this on every bond. If there was not enough solder paste, you sometimes have to cut off a few millimeters of solder wire, stick that in the hole, then bring in the soldering iron.
-
-
-## Bonus: One push
-KiCAD does not have a great notion of a macro - scripts that you can run repeatedly while editing them on the fly. The onepush plugin gives a button that runs a particular file in "onepush_script.py". Any edits to this file are reloaded when the button is pushed. It can import other code such as libraries you are debugging. These libraries can also be reloaded on the fly using `reload` commands. Refer to the plugin files for more instructions.

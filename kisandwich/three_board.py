@@ -1,7 +1,6 @@
 import os
 import pcbnew
 from kigadgets.board import Board
-from kisandwich import objview
 import kisandwich.core as core
 
 

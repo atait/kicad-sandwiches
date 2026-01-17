@@ -1,10 +1,11 @@
+""" Top level importer for multiple action plugin packages
+"""
 import sys, os
-sys.path.append(os.path.dirname(__file__))
+from kigadgets import kireload
 
-try:
-    import expose_kigadgets_plugin
-except ImportError:
-    pass
+if os.path.dirname(__file__) not in sys.path:
+    sys.path.insert(0, os.path.dirname(__file__))
+
 
 # import onepush
 # import mousebite_kigadget  # This has moved to kigadgets
