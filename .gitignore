@@ -19,3 +19,4 @@ kisandwich/_version.py
 
 # Distribution files
 *.egg-info
+build
