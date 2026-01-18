@@ -28,7 +28,7 @@ def sandwich2_LOW():
     # breakpoint()
     return outfile
 
-@pytest.mark.skip('Working but lytest is not loading!?')
+# @pytest.mark.skip('Working but lytest is not loading!?')
 def test_sandwich2_LOW(): difftest_it(sandwich2_LOW)()
 
 @contained_script
@@ -38,5 +38,5 @@ def sandwich2_TOP():
     sandwich_from_file(infile, which_one='TOP', outfile=outfile, proc_opts=proc_opts)
     return outfile
 
-@pytest.mark.skip('Working but lytest is not loading!?')
+# @pytest.mark.skip('Working but lytest is not loading!?')
 def test_sandwich2_TOP(): difftest_it(sandwich2_TOP)()
