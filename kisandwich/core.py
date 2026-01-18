@@ -361,4 +361,4 @@ def sandwich_from_file(infile, which_one='LOW', outfile=None, proc_opts=None):
         # outwrl = outfile.split('.')[0] + '.wrl'
         export_vrml(workingpcb, outvrml)
     except Exception:
-        pass
+        print('Failed to export VRML')

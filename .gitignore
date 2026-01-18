@@ -13,3 +13,9 @@ __pycache__
 *.FCStd1
 
 *.log
+
+# Auto-generated version file
+kisandwich/_version.py
+
+# Distribution files
+*.egg-info
