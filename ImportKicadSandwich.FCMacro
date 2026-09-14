@@ -4,7 +4,7 @@
     Now also works with VRMLs exported from kicad
 
     To install,
-    1. copy this file to ~/.FreeCAD/Macro/
+    1. copy this file to ~/.FreeCAD/Macro/ (Linux) or ~/Library/Application Support/FreeCAD/Macro/ (Mac)
     2. Install KicadStepUp through the package manager.
     3. Add a toolbar item following instructions here https://wiki.freecadweb.org/Macros
 '''

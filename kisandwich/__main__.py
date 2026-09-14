@@ -15,14 +15,16 @@ def main():
         epilog="""
 Examples:
   %(prog)s board.kicad_pcb --which-one LOW
-  %(prog)s board.kicad_pcb --which-one TOP --outfile top_board.kicad_pcb
+  %(prog)s board.kicad_pcb -w TOP -o top_board.kicad_pcb
   %(prog)s board.kicad_pcb --which-one MID --outfile output/mid_board.kicad_pcb
+  %(prog)s board.kicad_pcb --which-one ALL
 
 Available which_one values:
   TOP     - Top board of the sandwich
   LOW     - Bottom board of the sandwich
-  MID     - Middle board (for 3-board sandwiches)
+  MID     - Middle board (for 3-board sandwiches, 6-layer PCBs only)
   STENCIL - Stencil board
+  ALL     - Generate all applicable boards (TOP, LOW, and MID if 6-layer)
         """
     )
 
@@ -32,8 +34,8 @@ Available which_one values:
     )
 
     parser.add_argument(
-        '--which-one',
-        choices=['TOP', 'LOW', 'MID', 'STENCIL'],
+        '--which-one', '-w',
+        choices=['TOP', 'LOW', 'MID', 'STENCIL', 'ALL'],
         default='LOW',
         help='Which board layer to generate (default: LOW)'
     )
@@ -61,6 +63,11 @@ Available which_one values:
         print(f"Error: Input file must be a .kicad_pcb file", file=sys.stderr)
         sys.exit(1)
 
+    # Validate outfile for ALL mode
+    if args.which_one == 'ALL' and args.outfile:
+        print("Error: --outfile cannot be specified with --which-one ALL", file=sys.stderr)
+        sys.exit(1)
+
     # Create output directory if needed
     if args.outfile:
         out_dir = os.path.dirname(args.outfile)
@@ -69,7 +76,6 @@ Available which_one values:
 
     try:
         sandwich_from_file(args.infile, args.which_one, args.outfile)
-        print(f"Successfully created sandwich board: {args.outfile or 'default location'}")
     except Exception as e:
         print(f"Error processing file: {e}", file=sys.stderr)
         sys.exit(1)

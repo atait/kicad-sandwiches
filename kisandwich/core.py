@@ -348,6 +348,23 @@ def base_to_default_boardfile(filepath, which_one='LOW', subdirectory=''):
 
 def sandwich_from_file(infile, which_one='LOW', outfile=None, proc_opts=None):
     ''' The CLI '''
+
+    # Handle ALL case
+    if which_one == 'ALL':
+        raise NotImplementedError('"ALL" does not work due to KiCad C++ memory leak in headless mode. Only one board per python process.')
+        # Load PCB once to detect layer count
+        workingpcb = Board.load(infile)
+        n_boards = workingpcb.native_obj.GetCopperLayerCount() // 2
+        boards_to_process = ['TOP', 'LOW', 'STENCIL']
+        if n_boards >= 3:
+            boards_to_process.append('MID')
+
+        # Process each board type
+        for board_type in boards_to_process:
+            sandwich_from_file(infile, board_type, None, proc_opts)
+        return
+
+    # Normal single board processing
     if outfile is None:
         outfile = base_to_default_boardfile(infile, which_one, subdirectory='kisandwich-out')
     proc_opts_full = proc_opts_default.copy()
@@ -356,9 +373,10 @@ def sandwich_from_file(infile, which_one='LOW', outfile=None, proc_opts=None):
     workingpcb = Board.load(infile)
     process_all(workingpcb, which_one, proc_opts_full)
     workingpcb.save(outfile)
+    if which_one == 'STENCIL':
+        return
     try:
         outvrml = os.path.splitext(outfile)[0] + '.wrl'
-        # outwrl = outfile.split('.')[0] + '.wrl'
         export_vrml(workingpcb, outvrml)
     except Exception:
         print('Failed to export VRML')
