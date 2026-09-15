@@ -1,23 +1,34 @@
 # KiSandwich
-Plugin for designing multi-PCB systems where PCBs are bonded together. This is a useful construction technique for extending form factor, component density, and cost of circuit projects. Since this technique is rare and new, there is a complete lack of design tools, professional or otherwise, for these methods.
+# KiSandwich
+
+A KiCad plugin for designing **sandwich PCBs** — multiple boards bonded
+together face-to-face into one device. Doing this lets you hide components
+completely inside the stack, get 4-layer routing out of a pair of 2-layer
+boards, and build truly zero-profile hardware (business cards, wallet-thin
+gadgets, embedded speakers and microSD slots).
+
+This construction technique is new and rarely used, so no design tools exist
+for it — professional or otherwise. KiSandwich is an attempt to fill that gap:
+you design one combined board in KiCad, and the plugin splits it into the
+individual 2-layer boards you actually fabricate and bond.
 
 ![zeroprofile-businesscard-side](media/zeroprofile-businesscard-side.jpeg)
-
 ![zeroprofile-businesscard](media/zeroprofile-businesscard.jpeg)
 
 ## Concept
-![2board](media/concept-2board.png)
 
-![3board](media/concept-3board.png)
+![2-board sandwich](media/concept-2board.png)
+![3-board sandwich](media/concept-3board.png)
 
 ## Why would you do this
-3. Tuck components away to create a flat surface on both sides. Put it in a wallet or something. With a third board on top, one can even hide components completely.
-1. Effectively get 4-layer routing out of a pair of 2-layer boards
-2. Put components on both sides, even if the pick-and-place only supports single side
 
-Previous work: [Oreo construction](https://hackaday.com/2019/01/18/oreo-construction-hiding-your-components-inside-the-pcb/)
-For further reasoning and a build example, see https://hackaday.com/2019/01/18/oreo-construction-hiding-your-components-inside-the-pcb/
+1. **Zero-profile design.** Build truly flat hardware — slip it in a wallet, embed it in a case, or hide it completely.
+2. **Hide your components.** Recess and even hide parts into the board for things like backlit capacitive buttons.
+3. **Get more routing layers.** Effectively get 4-layer routing out of a pair of 2-layer boards (or 6-layer out of three).
+4. **Populate both sides cheaply.** Put components on both faces even if your pick-and-place only does one side.
 
+This builds on [Oreo construction](https://hackaday.com/2019/01/18/oreo-construction-hiding-your-components-inside-the-pcb/),
+which has more reasoning and a build example.
 ## Installation
 ### Install kigadgets
 This is a wrapper for KiCAD's python SWIG. It is needed for version-independent action plugins. Follow instructions at [kigadgets](https://github.com/atait/kicad-python).
