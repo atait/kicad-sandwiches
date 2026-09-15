@@ -1,29 +1,73 @@
 # KiSandwich
-Plugin for designing multi-PCB systems where PCBs are bonded together. This is a useful construction technique for extending form factor, component density, and cost of circuit projects. Since they are relatively new, there is a complete lack of design tools, professional or otherwise, for these methods.
+Plugin for designing multi-PCB systems where PCBs are bonded together. This is a useful construction technique for extending form factor, component density, and cost of circuit projects. Since this technique is rare and new, there is a complete lack of design tools, professional or otherwise, for these methods.
 
-![example](examples/FreeCAD-out/assembled-snapshot.png)
+![zeroprofile-businesscard-side](media/zeroprofile-businesscard-side.jpeg)
+
+![zeroprofile-businesscard](media/zeroprofile-businesscard.jpeg)
+
+## Concept
+![2board](media/concept-2board.png)
+
+![3board](media/concept-3board.png)
 
 ## Why would you do this
-1. Effectively get 4-layer routing out of a pair of (cheaper) 2-layer boards
+3. Tuck components away to create a flat surface on both sides. Put it in a wallet or something. With a third board on top, one can even hide components completely.
+1. Effectively get 4-layer routing out of a pair of 2-layer boards
 2. Put components on both sides, even if the pick-and-place only supports single side
-3. Tuck components away to create a flat surface on both sides. Put it in a wallet or something. With a third board on top, one could even hide components completely.
 
+Previous work: [Oreo construction](https://hackaday.com/2019/01/18/oreo-construction-hiding-your-components-inside-the-pcb/)
 For further reasoning and a build example, see https://hackaday.com/2019/01/18/oreo-construction-hiding-your-components-inside-the-pcb/
 
 ## Installation
-Clone this repository into your kicad user plugins directory. This directory is located in ${KICAD_USER_DIR}/scripting/plugins, where ${KICAD_USER_DIR} depends on your operating system. Find out where it is with [this article](https://forum.kicad.info/t/library-management-in-kicad-version-5/14636).
+### Install kigadgets
+This is a wrapper for KiCAD's python SWIG. It is needed for version-independent action plugins. Follow instructions at [kigadgets](https://github.com/atait/kicad-python).
+
+### Install kicad-sandwich action plugin
+Clone this repository. Symlink the whole thing (`kicad-sandwiches`) into your kicad user plugins directory. This directory is located in ${KICAD_USER_DIR}/scripting/plugins, where ${KICAD_USER_DIR} depends on your operating system. You can find out where it is using the menu item "Tools > External Plugins > Reveal Plugin Folder". On macOS, you can avoid the terminal by right clicking the repo, making an "alias", and moving that alias to the plugins directory.
 
 The next time you start pcbnew, you should see these icons in the menu bar.
 
-![onepush](onepush/icons/photon-32.png) ![sandwich](kisandwich/icons/sandwich-32.png)
+![sandwich](kisandwich/icons/sandwich-32.png)
 
 If not, try going to Preferences>"action plugins" to search for them in the list and check the enable boxes.
 
-## Usage
+## Examples
+### Example files
 The "examples" directory walks through a full design flow. The main design file is called "sandwich-example.kicad_pcb". It is designed as a 4-layer board with surface mount components on front and back. The image "pcbnew-snapshot.png" shows what the program *thinks* you are designing.
 
-![4layer](examples/pcbnew-snapshot.png)
+![4layer](media/pcbnew-snapshot.png)
 
+and here is what you are actually designing. Bottom board is green. Top board is red and transparent, and both ICs are recessed:
+
+![assembled-snapshot](media/assembled-snapshot.png)
+
+### Example footprints (tested and fabricated)
+KiCAD footprints are found in kicad-sandwiches.pretty. Put them in a project library or a global library, and add that to your footprint paths to use them.
+
+#### 2-board Arduino Nano
+It is not quite zero profile because of the USBmicro but very close.
+
+![zeroprofile-businesscard-side](media/zeroprofile-businesscard-side.jpeg)
+
+#### 3-board Arduino Nano
+This is a 3-board sandwich with the Arduino Nano in the middle. It is completely hidden and zero profile. There is a hole so the reset button can be accessed.
+
+![arduino-3layer](media/arduino-3layer.png)
+
+#### Sandwich speaker
+A zero-profile high-quality magnetic speaker (not a buzzer). It is almost exactly 5.2mm thick, so it fits with a 2mm midboard and 1.6mm outer boards. There is no room for screws, so it is glued in. Wire contacts are soldered to the midboard, so they are zero-profile too.
+
+Tested with Digikey part: CLS0281MAE-L152
+
+![sandwich-speaker](media/sandwich-speaker.png)
+
+#### Hidden microSD card slot
+A microSD card slot that is completely hidden and zero profile. It is accessed from the side of the sandwich.
+
+![microsd-hidden](media/microsd-hidden.jpeg)
+![microsd-hidden-layout](media/microsd-hidden-layout.png)
+
+## Designing
 #### Actual layer meanings
 The real thing will be stacked in the opposite order. F.Cu and B.Cu are used to represent the layers on the inside of the sandwich, while In1.Cu and In2.Cu represent what will become the outside of the sandwich. F and B will bond to one another with solder.
 
@@ -33,7 +77,7 @@ The reason for doing this is that blind vias make sense (except blind vias betwe
 
 **User.Eco2** makes cuts in the LOW board. Make sure cuts defined by Eco2 do not intersect footprints on Front. If it is a 2-board internal stack, put Eco2 openings around footprints on Back.
 
-**Margin *or* User.3** make cuts in the MID board if there is a 3-board stackup (i.e. 6 copper layers). In a 3-board stack (almost always internal), make sure there are slots in this layer for all footprints on front or back.
+**Margin *or* User.3** make cuts in the MID board if there is a 3-board stackup (i.e. 6 copper layers). In a 3-board stack, make sure there are slots in this layer for all footprints on front or back.
 
 #### Running the scripts
 Using the kisandwich plugin, this "board" is converted to two other files corresponding to the actual 2-layer boards: "kisandwich-out/sandwich-example-sandwich_\[LOW|TOP\].kicad_pcb". The plugin is activated with the ![sandwich](kisandwich/icons/sandwich-32.png) button, which gives a dialog with various options.
@@ -56,17 +100,17 @@ In the same directory, all the boards are exported to VRML (.wrl) models.
 
 The models are assembled together in FreeCAD in the file "FreeCAD-out/stack-3dModel.FCStd". In FreeCAD, the lower board is translated down by one board thickness, and their appearances can be altered. Finally, a snapshot of the FreeCAD assembly is included in "FreeCAD-out/assembled-snapshot.png".
 
-**Todo: describe the different ways FreeCAD can import**
-
 #### DRC
-The overall design should pass DRC. This will catch things like wires too close, and it won't hit non-errors like F.Cu crossing a B.Cu/In2.Cu buried via. It might have strange hits on edge aspects, which is what the next step is for.
+Both the source combined design and kisandwich outputs should roughly make sense as PCBs. The whole process of kisandwiches is designed to make both perspectives sensible.
+The outputs must be valid 2-layer PCBs. The combined design should be a valid 6-layer or 4-layer PCB design, just with some new features and some other features verboten. This means DRC is a valid and highly useful tool.
 
-All of the kisandwich-out boards should also pass DRC. This will catch things like inclusion of tracks within edge cuts. KiCad's routing assistant does not know which Eco layers to avoid. That means there are 4 DRCs to do; they are meant to help you, so suck it up and hunt down those errors.
+The overall design should pass DRC, except for board outline violations. This will catch things like wires too close, and it won't hit non-errors like F.Cu crossing a B.Cu/In2.Cu buried via. It might have strange hits on edge aspects, which is what the individual-output board DRC is for.
 
-A broader point: both the combined design and kisandwich outputs should roughly make sense as PCBs. The outputs must be valid 2-layer PCBs. The combined design should be a valid 6-layer or 4-layer PCB design, just with some new features and some other features verboten. The whole process of kisandwiches is designed to make both perspectives sensible.
+All of the kisandwich-out boards should also pass DRC: clean. This will catch things like inclusion of tracks within edge cuts. KiCad's routing assistant does not know which Eco layers to avoid. That means (for a 3-board stackup) there are 4 DRCs to do: one for the combined design, and one for each of the three boards. They are meant to help you, so suck it up, iterate, and hunt down those errors.
+
 
 #### Ctrl-Z
-It finally works now. This was revolutionary. You can preview TOP, Ctrl-Z, preview LOW, Ctrl-Z without modifying anything or creating temporary files. It is recommended that you close and reopen the file after previewing the sandwiches, just in case. As far as I know, Ctrl-Z works 100%, but just in case.
+It finally works now. This was revolutionary. You can preview TOP, Ctrl-Z, preview LOW, Ctrl-Z without modifying anything or creating temporary files. It is recommended that you close and reopen the file after previewing the sandwiches *without saving*, just in case. As far as I know, Ctrl-Z works 100%, but just in case.
 
 ## Advanced features for 3-board stackups
 See `kisandwich/three_board.py` for full information about modified layer mappings.
@@ -145,4 +189,4 @@ No stencil here. Take your solder paste in a syringe, and put dabs directly on b
 ### Procedure for rework
 Yield is pretty good but less than 100%. You can use a continuity meter on the outside of the stackup to see what didn't connect. This does not work on buried bond pads, so you also have to rely on functional testing. LED not lighting up? It probably has something to do with the bond pad to that LED.
 
-Jam the soldering iron into the hole of the disconnected bond pads. This will not damage good bonds, so you could just do this on every bond. If there was not enough solder paste, you sometimes have to cut off a few millimeters of solder wire, stick that in the hole, then bring in the soldering iron.
+Jam the soldering iron with sharp conical tip into the hole of the disconnected bond pads. This will not damage good bonds, so you could just do this on every bond. If there was not enough solder paste, you sometimes have to cut off a few millimeters of solder wire, stick that in the hole, then bring in the soldering iron.
