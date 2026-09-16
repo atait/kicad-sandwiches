@@ -162,7 +162,7 @@ This does not work great for 2-board because both have components placed. With 3
 
 
 ## Construction methodology
-Holy shit, it works. I have so far made 2x 2-board designs, and about 5x 3-board designs. Full documentation of that process with pictures is on the way... TODO. A quick summary will have to do for now.
+I have so far made 4x 2-board designs, and about 5x 3-board designs. I have mass produced about 150x copies of these designs in batches. Full documentation of that process with pictures is on the way... A quick summary will have to do for now.
 
 ### What you need
 - Crocodile clamps. These apply a lot more force than alligator clamps
